@@ -6,5 +6,5 @@ declare global {
   var stackTrace: import('../src/utils/StackTrace').default;
   var JSONUtil: import('../src/utils/JSONUtil').default;
   var config: import('../src/utils/Config').default;
-  var hypixel: import ('../src/utils/Hypixel').default;
+  var hypixel: import('../src/utils/Hypixel').default;
 }
