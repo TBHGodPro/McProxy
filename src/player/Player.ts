@@ -10,6 +10,7 @@ import { Status } from 'hypixel-api-reborn';
 import { Direction, IPlayer, Location, Team } from '../Types';
 import * as prismarineWindow from 'prismarine-windows';
 import ModuleHandler from '../modules/ModuleHandler';
+import CommandHandler from '../commands/CommandHandler';
 
 export default class Player extends (EventEmitter as new () => TypedEventEmitter<PlayerEvents>) {
   public readonly proxy: PlayerProxy;
@@ -18,6 +19,7 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
   public readonly listener: PlayerListener;
 
   public readonly modules: ModuleHandler;
+  public readonly commands: CommandHandler;
 
   public client: ServerClient | null = null;
   public server: Client | null = null;
@@ -73,6 +75,7 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
     this.listener = new PlayerListener(this.proxy);
 
     this.modules = new ModuleHandler(this);
+    this.commands = new CommandHandler();
 
     // APIs
 
@@ -179,9 +182,12 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
       else this.teams.push({ name, players });
     });
 
-    // Load Modules
+    // Load Features
 
+    this.commands.loadAll([CommandHandler.implDIR]);
     this.modules.loadAll([ModuleHandler.implDIR]); // TODO: custom module paths
+
+    this.commands.setup(this);
   }
 
   public connect(toClient: ServerClient, toServer: Client) {

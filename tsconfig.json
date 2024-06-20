@@ -15,8 +15,7 @@
     "allowJs": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "*": ["types/*.d.ts"],
-      "src/*": ["./src/*"]
+      "*": ["types/*.d.ts"]
     },
     "baseUrl": ".",
     "skipLibCheck": true

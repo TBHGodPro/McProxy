@@ -1,7 +1,17 @@
-export default abstract class Command<C extends CommandConfig> {
-  public readonly config: Required<C>;
+import { player } from '..';
 
-  constructor(config: C) {
+export default abstract class Command {
+  public readonly config: CommandConfig;
+
+  private _registered: boolean = false;
+  public get registered(): boolean {
+    return this._registered;
+  }
+  public set registered(value: boolean) {
+    if (!this._registered && value) this._registered = true;
+  }
+
+  constructor(config: CommandConfig) {
     if (typeof config.name !== 'string') throw new Error('Command Name should be a string!');
     if (config.aliases && config.aliases.find(i => typeof i !== 'string')) throw new Error('All Command Aliases should be strings!');
 
@@ -11,9 +21,10 @@ export default abstract class Command<C extends CommandConfig> {
     if (config.args) {
       let hasHadOptionalArg = false;
       for (const arg of config.args) {
-        if (!arg || typeof arg.name !== 'string' || typeof arg.required !== 'boolean' || (arg.type && !['string', 'number', 'boolean'].includes(arg.type))) throw new Error('Invalid Comamnd Args!');
+        if (!arg || typeof arg.required !== 'boolean' || (arg.type && !['string', 'number', 'boolean'].includes(arg.type.toLowerCase().trim()))) throw new Error('Invalid Comamnd Args!');
 
         arg.type ??= 'string';
+        arg.type = arg.type.toLowerCase().trim() as any;
 
         if (!arg.required && !hasHadOptionalArg) hasHadOptionalArg = true;
         if (arg.required && hasHadOptionalArg) throw new Error('Required arguments cannot come after optional arguments in commands!');
@@ -23,30 +34,24 @@ export default abstract class Command<C extends CommandConfig> {
     this.config = config as any;
   }
 
-  public handleIncoming(command: RawCommandData): boolean {
+  public register() {
+    player.commands.register(this);
+  }
+
+  public handleIncoming(command: RawCommandData) {
     if (this.config.name === command.command || this.config.aliases!.includes(command.command)) {
       let finalArgs: CommandData['args'] = [];
 
       if (this.config.args?.length) {
-        if (command.args.length < this.config.args.filter(i => i.required).length || command.args.length > this.config.args.length) {
-          this.sendCommandTip(true);
-          return true;
-        }
+        if (command.args.length < this.config.args.filter(i => i.required).length || command.args.length > this.config.args.length) return this.sendCommandTip(true);
 
         for (let i = 0; i < this.config.args.length; i++) {
           const confArg = this.config.args[i];
           const arg = command.args[i];
 
-          if (!arg) break;
-          if (typeof arg !== confArg.type) {
-            this.sendCommandTip(true);
-            return true;
-          }
+          if (confArg.type === 'number' && isNaN(arg as any)) return this.sendCommandTip(true);
 
-          if (confArg.type === 'boolean' && !['t', 'f', 'true', 'false', 'y', 'n', 'yes', 'no'].includes(arg.toLowerCase())) {
-            this.sendCommandTip(true);
-            return true;
-          }
+          if (confArg.type === 'boolean' && !['t', 'f', 'true', 'false', 'y', 'n', 'yes', 'no'].includes(arg.toLowerCase())) return this.sendCommandTip(true);
         }
 
         finalArgs = command.args.map((arg, i) => {
@@ -80,18 +85,13 @@ export default abstract class Command<C extends CommandConfig> {
             }
           }
         });
-      } else if (command.args.length) {
-        this.sendCommandTip(true);
-        return true;
-      }
+      } else if (command.args.length) return this.sendCommandTip(true);
 
       this.handle({
         command: command.command,
         args: finalArgs,
       });
-
-      return true;
-    } else return false;
+    }
   }
 
   public sendCommandTip(error: boolean) {
@@ -110,7 +110,6 @@ export interface CommandConfig {
 export type CommandArgTypes = 'string' | 'number' | 'boolean';
 
 export interface CommandArg {
-  name: string;
   required: boolean;
   type?: CommandArgTypes;
 }

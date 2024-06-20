@@ -1,7 +1,7 @@
-import { EntityMetadata } from 'src/PacketTypings';
+import { EntityMetadata } from '../../PacketTypings';
 import { Direction, Location } from '../../Types';
 import Module, { ModuleInfo, ModuleSettings, ModuleSettingsSchema } from '../Module';
-import { ServerPacket } from 'src/player/PlayerProxy';
+import { ServerPacket } from '../../player/PlayerProxy';
 
 // Y: 33 blocks in the direction facing (negative pitch is up, positive is down)
 // X and Z: 32 blocks in the direction facing
