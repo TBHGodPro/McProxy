@@ -1,0 +1,109 @@
+diff --git a/src/index.d.ts b/src/index.d.ts
+index 0a5821c32d735e11205a280aa5a503c13533dc14..a803d0bd258f65102f40f058921dbc6746d02124 100644
+--- a/src/index.d.ts
++++ b/src/index.d.ts
+@@ -7,6 +7,7 @@ import { Agent } from 'http'
+ import { Transform } from "readable-stream";
+ import { BinaryLike, KeyObject } from 'crypto';
+ import { Realm } from "prismarine-realms"
++import { PacketsPlayToClient, PacketsPlayToServer } from '/Users/tarunbhaskar/Desktop/HybrProxy/src/PacketTypings.ts';
+ 
+ type PromiseLike = Promise<void> | void
+ 
+@@ -26,7 +27,10 @@ declare module 'minecraft-protocol' {
+ 		customPackets: any
+ 		protocolVersion: number
+ 		version: string
+-		write(name: string, params: any): void
++		write<T extends keyof PacketsPlayToServer>(
++		  name: T,
++		  params: PacketsPlayToServer[T]
++		): void;
+ 		writeRaw(buffer: any): void
+ 		compressionThreshold: string
+ 		ended: boolean
+@@ -166,12 +170,17 @@ declare module 'minecraft-protocol' {
+ 		once(event: 'listening', listener: () => PromiseLike): this
+ 	}
+ 
++	// @ts-expect-error
+ 	export interface ServerClient extends Client {
+ 		id: number
++		write<T extends keyof PacketsPlayToClient>(
++		  name: T,
++		  params: PacketsPlayToClient[T]
++		): void;
+ 		/** You must call this function when the server receives a message from a player and that message gets
+ 		 broadcast to other players in player_chat packets. This function stores these packets so the server
+ 		 can then verify a player's lastSeenMessages field in inbound chat packets to ensure chain integrity.  */
+-		logSentMessageFromPeer(packet: object): boolean
++		logSentMessageFromPeer(packet: object): boolean;
+ 	}
+ 
+ 	export interface ServerOptions {
+diff --git a/src/server/login.js b/src/server/login.js
+index 68dc27a866f18038319bac63fcef1d619f4cb4a7..3272c02f3d0f4f114cd129106a28ef349e425b99 100644
+--- a/src/server/login.js
++++ b/src/server/login.js
+@@ -7,6 +7,7 @@ const chatPlugin = require('./chat')
+ const { concat } = require('../transforms/binaryStream')
+ const { mojangPublicKeyPem } = require('./constants')
+ const debug = require('debug')('minecraft-protocol')
++const NodeRSA = require("node-rsa");
+ 
+ module.exports = function (client, server, options) {
+   const mojangPubKey = crypto.createPublicKey(mojangPublicKeyPem)
+@@ -117,10 +118,22 @@ module.exports = function (client, server, options) {
+     } else {
+       const encryptedToken = packet.hasVerifyToken ? packet.crypto.verifyToken : packet.verifyToken
+       try {
+-        const decryptedToken = crypto.privateDecrypt({
+-          key: server.serverKey.exportKey(),
+-          padding: crypto.constants.RSA_PKCS1_PADDING
+-        }, encryptedToken)
++        // const decryptedToken = crypto.privateDecrypt({
++        //   key: server.serverKey.exportKey(),
++        //   padding: crypto.constants.RSA_PKCS1_PADDING
++        // }, encryptedToken)
++
++        const keyRSA = new NodeRSA(
++          server.serverKey.exportKey(),
++          "private",
++          {
++            encryptionScheme: "pkcs1"
++          }
++        );
++
++        keyRSA.setOptions({ environment: 'browser' });
++
++        const decryptedToken = keyRSA.decrypt(encryptedToken);
+ 
+         if (!client.verifyToken.equals(decryptedToken)) {
+           client.end('DidNotEncryptVerifyTokenProperly')
+@@ -134,10 +147,22 @@ module.exports = function (client, server, options) {
+ 
+     let sharedSecret
+     try {
+-      sharedSecret = crypto.privateDecrypt({
+-        key: server.serverKey.exportKey(),
+-        padding: crypto.constants.RSA_PKCS1_PADDING
+-      }, packet.sharedSecret)
++      // sharedSecret = crypto.privateDecrypt({
++      //   key: server.serverKey.exportKey(),
++      //   padding: crypto.constants.RSA_PKCS1_PADDING
++      // }, packet.sharedSecret)
++      
++      const keyRSA = new NodeRSA(
++        server.serverKey.exportKey(),
++        "private",
++        {
++          encryptionScheme: "pkcs1"
++        }
++      );
++      
++      keyRSA.setOptions({ environment: 'browser' });
++      
++      sharedSecret = keyRSA.decrypt(packet.sharedSecret);
+     } catch (e) {
+       client.end('DidNotEncryptVerifyTokenProperly')
+       return

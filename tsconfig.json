@@ -1,20 +1,26 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
+    // "target": "ESNext",
+    // "module": "Es2020",
     "outDir": "./dist",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
-    "moduleResolution": "Node",
+    // "resolveJsonModule": true,
+    // "moduleResolution": "Node10",
     "strict": true,
-    "noImplicitAny": true,
+    // "noImplicitAny": true,
     "declaration": false,
     "sourceMap": false,
     "declarationMap": false,
     "allowJs": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "paths": {
+      "*": ["types/*.d.ts"],
+      "src/*": ["./src/*"]
+    },
+    "baseUrl": ".",
+    "skipLibCheck": true
   },
-  "include": ["src"],
+  "include": ["src", "types/globals.d.ts"],
   "exclude": ["node_modules"]
 }

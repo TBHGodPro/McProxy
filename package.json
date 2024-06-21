@@ -5,7 +5,6 @@
   "scripts": {
     "start": "node .",
     "build": "tsc",
-    "postinstall": "patch-package",
     "dev": "npm run build && npm start"
   },
   "author": "TBHGodPro",
@@ -13,6 +12,28 @@
   "description": "",
   "devDependencies": {
     "@types/node": "^20.12.8",
+    "@types/uuid": "^9.0.8",
+    "chalk": "^4.1.2",
+    "typed-emitter": "^2.1.0",
     "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@minecraft-js/uuid": "^1.0.3",
+    "hypixel-api-reborn": "^11.2.0",
+    "hypixel-mod-api-js": "../Hypixel Mod API JS",
+    "jsonschema": "^1.4.1",
+    "lc-apollo-js": "../LC-Apollo-JS",
+    "minecraft-protocol": "^1.47.0",
+    "node-rsa": "^1.1.1",
+    "prismarine-proxy": "^1.1.4",
+    "prismarine-windows": "^2.9.0",
+    "structured-clone": "^0.2.2",
+    "uuid": "^9.0.1"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "minecraft-protocol@1.47.0": "patches/minecraft-protocol@1.47.0.patch",
+      "prismarine-proxy@1.1.4": "patches/prismarine-proxy@1.1.4.patch"
+    }
   }
 }

@@ -1,0 +1,16 @@
+diff --git a/src/instant_connect_proxy.js b/src/instant_connect_proxy.js
+index a2fff8a5d50746f8a757ed9d9ce2f3cc58f61cd0..1672112bef86db279acb98b4b9e705a5ecca93a6 100644
+--- a/src/instant_connect_proxy.js
++++ b/src/instant_connect_proxy.js
+@@ -4,8 +4,9 @@ const packets = require('minecraft-packets').pc
+ const mcDataLoader = require('minecraft-data')
+ const PLAY_STATE = 'play'
+ const verMap = {
+-  '1.8.8': '1.8',
+-  '1.8.9': '1.8'
++  '1.8': '1.8.8',
++  '1.8.8': '1.8.8',
++  '1.8.9': '1.8.8'
+ }
+ 
+ function getPacket (ver, name, mcData) {
