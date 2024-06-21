@@ -43,7 +43,7 @@ function calculateBlock(pos: Location, dir: Direction): Location {
 export default class BossBarModule extends Module<BossBarSettings> {
   private ID = -1244;
   private get text(): string {
-    return this.settings.text + (this.settings.showStatus && this.player.status ? `§f | ${this.player.statusMessage}` : '');
+    return this.settings.text + (this.settings.showStatus && this.player.isHypixel && this.player.status ? `§f | ${this.player.statusMessage}` : '');
   }
   private health: number = 300;
   private spawned: boolean = false;

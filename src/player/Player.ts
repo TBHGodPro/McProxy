@@ -11,6 +11,7 @@ import { Direction, IPlayer, Location, Team } from '../Types';
 import * as prismarineWindow from 'prismarine-windows';
 import ModuleHandler from '../modules/ModuleHandler';
 import CommandHandler from '../commands/CommandHandler';
+import { setTimeout as wait } from 'timers/promises';
 
 export default class Player extends (EventEmitter as new () => TypedEventEmitter<PlayerEvents>) {
   public readonly proxy: PlayerProxy;
@@ -28,6 +29,7 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
   public readonly apollo: ApolloPlayer;
 
   public lastGameMode: string | null = null;
+  public isHypixel: boolean = false;
   public online: boolean | null = null;
   public status: Status | null = null;
   public teams: Team[] = [];
@@ -82,13 +84,33 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
 
     // APIs
 
-    this.hypixel = new ModAPIClient((channel, buf) => {
-      this.client?.write('custom_payload', {
-        channel,
-        data: Buffer.from(buf),
+    this.hypixel = new ModAPIClient({
+      send: (channel, buf) => {
+        this.server?.write('custom_payload', {
+          channel,
+          data: buf,
+        });
+      },
+      debug: false,
+      maxPingTimeout: 5_000,
+    });
+    this.hypixel.on('hello', async () => {
+      await wait(500);
+      Logger.info('Connected to Hypixel!');
+      this.isHypixel = true;
+      this.hypixel.register(['hyevent:location']);
+      this.hypixel.ping(false).then(res => {
+        Logger.debug('Ping to Hypixel is ' + res.displayPingMS + 'ms');
       });
     });
-    // TODO : hypixel mod api integration
+    this.hypixel.on('LOCATION', data => {
+      this.status = new Status({
+        online: true,
+        gameType: data.serverType?.name,
+        mode: data.mode ?? (data.lobbyName ? 'LOBBY' : null),
+        map: data.map,
+      });
+    });
 
     this.apollo = new ApolloPlayer({
       handling: {
@@ -109,9 +131,24 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
       },
     });
 
+    this.proxy.on('fromServer', ({ data, name }) => {
+      if (name === 'player_info' && data.action === 2 && data.data.find(i => i.UUID === this.uuid)) {
+        setTimeout(() => this.hypixel.setConnected(true), 1000);
+      }
+      if (name !== 'custom_payload') return;
+
+      if (data.channel.trim().toLowerCase().startsWith('hy')) this.hypixel.receivePacket(data.channel, data.data);
+    });
+    this.proxy.on('fromClient', ({ data, name }) => {
+      if (name !== 'custom_payload') return;
+
+      if (data.channel.trim().toLowerCase() === 'lunar:apollo') this.apollo.receivePacket(data.data);
+    });
+
     // Listener Events
 
     this.listener.on('switch_server', async () => {
+      this.hypixel.setConnected(false);
       this.teams = [];
       this.connectedPlayers = [];
       this.inventory.clear();
@@ -194,6 +231,7 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
   }
 
   public connect(toClient: ServerClient, toServer: Client) {
+    this.isHypixel = false;
     this.client = toClient;
     this.server = toServer;
     this.uuid = this.client.uuid;
@@ -210,6 +248,7 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
   }
 
   public disconnect() {
+    this.isHypixel = false;
     this.client = null;
     this.server = null;
     this.uuid = null;
