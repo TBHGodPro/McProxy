@@ -33,6 +33,9 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
   public teams: Team[] = [];
   public connectedPlayers: IPlayer[] = [];
   public uuid: string | null = null;
+  public get username(): string | null {
+    return this.client?.username ?? null;
+  }
   public location: Location | null = null;
   public lastLocation: Location | null = null;
   public direction: Direction | null = null;
@@ -229,6 +232,10 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
       .catch(() => {
         this.status = null;
       });
+  }
+
+  public sendMessage(text: string): void {
+    this.client?.write('chat', { message: JSON.stringify({ text }) });
   }
 }
 

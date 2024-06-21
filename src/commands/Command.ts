@@ -1,7 +1,9 @@
+import Player from '../player/Player';
 import { player } from '..';
 
 export default abstract class Command {
   public readonly config: CommandConfig;
+  public readonly player: Player;
 
   private _registered: boolean = false;
   public get registered(): boolean {
@@ -12,6 +14,8 @@ export default abstract class Command {
   }
 
   constructor(config: CommandConfig) {
+    this.player = player;
+
     if (typeof config.name !== 'string') throw new Error('Command Name should be a string!');
     if (config.aliases && config.aliases.find(i => typeof i !== 'string')) throw new Error('All Command Aliases should be strings!');
 
@@ -48,6 +52,8 @@ export default abstract class Command {
         for (let i = 0; i < this.config.args.length; i++) {
           const confArg = this.config.args[i];
           const arg = command.args[i];
+
+          if (!arg && !confArg.required) break;
 
           if (confArg.type === 'number' && isNaN(arg as any)) return this.sendCommandTip(true);
 
