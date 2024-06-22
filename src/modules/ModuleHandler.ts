@@ -22,11 +22,15 @@ export default class ModuleHandler {
 
     if (!paths.includes(ModuleHandler.implDIR)) paths.push(ModuleHandler.implDIR);
 
+    await config.read();
+
     for (const path of paths) {
       const files = (await readdir(path).catch(i => [])).filter(i => i.endsWith('.js') || i.endsWith('.cjs'));
 
       await Promise.all(files.map(file => this.load(join(path, file))));
     }
+
+    await config.write();
   }
 
   public async load(path: string) {
@@ -67,7 +71,7 @@ export default class ModuleHandler {
 
         if (module.verifySettings && module.getDefaultSettings && !module.verifySettings(module.getDefaultSettings())) throw new Error('Invalid Module Default Settings!');
 
-        await ModuleManager.getModuleData(ref);
+        await ModuleManager.getModuleData(ref, false);
 
         if (!ModuleManager.verifySettings(ref, ref.settings).success) {
           // TODO: Fix dynamic saving

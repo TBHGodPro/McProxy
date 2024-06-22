@@ -19,6 +19,9 @@ importers:
       '@minecraft-js/uuid':
         specifier: ^1.0.3
         version: 1.0.3
+      axios:
+        specifier: ^1.7.2
+        version: 1.7.2
       hypixel-api-reborn:
         specifier: ^11.2.0
         version: 11.2.0

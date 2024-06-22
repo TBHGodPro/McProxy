@@ -20,9 +20,9 @@ interface Module<S extends ModuleSettings> {
   /** Give the proxy your module's default settings, will be empty by default if not implemented (THIS METHOD MAY BE CALLED OFTEN) */
   getDefaultSettings?(): S;
   /** Ran to check that all settings values are valid, will assume true if not implemented */
-  verifySettings?(settings: ModuleSettings): boolean;
+  verifySettings?(settings: S): boolean;
   /** Ran after a verified settings change to allow the module to update itself (THIS METHOD MAY BE CALLED OFTEN) */
-  updateSettings?(settings: ModuleSettings): void;
+  updateSettings?(settings: S): void;
 }
 
 abstract class Module<S extends ModuleSettings> {

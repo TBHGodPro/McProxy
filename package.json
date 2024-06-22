@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@minecraft-js/uuid": "^1.0.3",
+    "axios": "^1.7.2",
     "hypixel-api-reborn": "^11.2.0",
     "hypixel-mod-api-js": "../Hypixel Mod API JS",
     "jsonschema": "^1.4.1",

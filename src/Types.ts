@@ -1,6 +1,7 @@
 import { Client } from 'minecraft-protocol';
 import { Slot } from './PacketTypings';
 import { ModuleSettings } from './modules/Module';
+import { ClientboundPartyInfo } from 'hypixel-mod-api-js/dist/packets/impl/clientbound/ClientboundPartyInfoPacket';
 
 export interface Config {
   apiKey: string;
@@ -57,4 +58,11 @@ export interface IPlayer {
   uuid: string;
   entityId?: number;
   location?: Location;
+}
+
+export interface Party extends ClientboundPartyInfo {}
+
+export interface APIPlayer {
+  uuid: string;
+  username: string;
 }

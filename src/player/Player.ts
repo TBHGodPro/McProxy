@@ -7,7 +7,7 @@ import { Client as ModAPIClient } from 'hypixel-mod-api-js';
 import { Player as ApolloPlayer } from 'lc-apollo-js';
 import PlayerListener from './PlayerListener';
 import { Status } from 'hypixel-api-reborn';
-import { Direction, IPlayer, Location, Team } from '../Types';
+import { Direction, IPlayer, Location, Party, Team } from '../Types';
 import * as prismarineWindow from 'prismarine-windows';
 import ModuleHandler from '../modules/ModuleHandler';
 import CommandHandler from '../commands/CommandHandler';
@@ -33,6 +33,7 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
   public online: boolean | null = null;
   public status: Status | null = null;
   public teams: Team[] = [];
+  public party: Party = { inParty: false, members: new Map() };
   public connectedPlayers: IPlayer[] = [];
   public uuid: string | null = null;
   public get username(): string | null {
@@ -111,6 +112,11 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
         map: data.map,
       });
     });
+    setInterval(async () => {
+      if (!this.isHypixel) return;
+      const res = await this.hypixel.getPartyInfo(5000);
+      if (res) this.party = res;
+    }, 5000);
 
     this.apollo = new ApolloPlayer({
       handling: {
@@ -245,6 +251,35 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
     this.proxy.setup();
 
     this.modules.connect();
+
+    this.apollo.connect();
+    this.apollo.configureSettings(
+      {
+        target: 'staff_mod',
+        case: 'apolloModule',
+        enabled: true,
+      },
+      {
+        target: 'notification',
+        case: 'apolloModule',
+        enabled: true,
+      },
+      {
+        target: 'team',
+        case: 'apolloModule',
+        enabled: true,
+      },
+      {
+        target: 'glow',
+        case: 'apolloModule',
+        enabled: true,
+      },
+      {
+        target: 'cooldown',
+        case: 'apolloModule',
+        enabled: true,
+      }
+    );
   }
 
   public disconnect() {

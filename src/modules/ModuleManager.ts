@@ -50,8 +50,8 @@ export default class ModuleManager {
     return true;
   }
 
-  public static async getModuleData<T extends ModuleSettings>(module: ModuleReference<T>): Promise<{ enabled: boolean; settings: T }> {
-    const conf = await config.read();
+  public static async getModuleData<T extends ModuleSettings>(module: ModuleReference<T>, readAndWrite: boolean = true): Promise<{ enabled: boolean; settings: T }> {
+    const conf = readAndWrite ? await config.read() : config.cached;
 
     conf.modules ??= {};
 
@@ -70,13 +70,13 @@ export default class ModuleManager {
       module.module[module.enabled ? 'start' : 'stop']?.();
     }
 
-    await config.write();
+    if (readAndWrite) await config.write();
 
     return conf.modules[module.info.id] as any;
   }
 
-  public static getModuleDataSync<T extends ModuleSettings>(module: ModuleReference<T>): { enabled: boolean; settings: T } {
-    const conf = config.readSync();
+  public static getModuleDataSync<T extends ModuleSettings>(module: ModuleReference<T>, readAndWrite: boolean = true): { enabled: boolean; settings: T } {
+    const conf = readAndWrite ? config.readSync() : config.cached;
 
     conf.modules ??= {};
 
@@ -95,7 +95,7 @@ export default class ModuleManager {
       module.module[module.enabled ? 'start' : 'stop']?.();
     }
 
-    config.writeSync();
+    if (readAndWrite) config.writeSync();
 
     return conf.modules[module.info.id] as any;
   }

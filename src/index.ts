@@ -4,6 +4,7 @@ import { Client, ServerClient, ping } from 'minecraft-protocol';
 import { InstantConnectProxy } from 'prismarine-proxy';
 import { NIL } from 'uuid';
 import Player from './player/Player';
+import PlayerManager from './utils/PlayerManager';
 
 if (process.version.split('.')[0] !== 'v18') throw new Error('Must use Node.JS v20! (Using ' + process.version + ')');
 
@@ -14,6 +15,8 @@ if (!/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12
   Logger.error('Invalid API Key! Make sure to put a valid API Key in the config.json(c) file');
   process.exit(1);
 }
+
+export const playerManager = new PlayerManager();
 
 hypixel.init();
 
