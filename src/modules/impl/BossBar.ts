@@ -115,6 +115,7 @@ export default class BossBarModule extends Module<BossBarSettings> {
       name: 'Boss Bar',
       version: '1.0.0',
       description: 'Customizable Boss Bar Module',
+      author: 'TBHGodPro',
     };
   }
 

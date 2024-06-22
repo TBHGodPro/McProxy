@@ -11,6 +11,7 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/discord-rpc": "^4.0.8",
     "@types/node": "^20.12.8",
     "@types/uuid": "^9.0.8",
     "chalk": "^4.1.2",
@@ -20,6 +21,7 @@
   "dependencies": {
     "@minecraft-js/uuid": "^1.0.3",
     "axios": "^1.7.2",
+    "discord-rpc": "^4.0.1",
     "hypixel-api-reborn": "^11.2.0",
     "hypixel-mod-api-js": "../Hypixel Mod API JS",
     "jsonschema": "^1.4.1",

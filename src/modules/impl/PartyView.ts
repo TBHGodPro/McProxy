@@ -11,6 +11,7 @@ export default class PartyViewModule extends Module<PartyViewSettings> {
       name: 'Party View',
       version: '1.0.0',
       description: "Highlights party members with Lunar Clent's Party View Mod",
+      author: 'TBHGodPro',
     };
   }
 
