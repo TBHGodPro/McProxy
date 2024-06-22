@@ -1,3 +1,4 @@
+import { Party } from '../../Types';
 import { playerManager } from '../../';
 import Module, { ModuleInfo, ModuleSettings, ModuleSettingsSchema } from '../Module';
 
@@ -39,31 +40,33 @@ export default class PartyViewModule extends Module<PartyViewSettings> {
     this.color = eval(`0x${settings.colorHex}`);
   }
 
-  private interval: NodeJS.Timer | null = null;
+  private readonly listener = async (party: Party) => {
+    if (!party.inParty) return this.player.apollo.removeAllTeammates(true);
+
+    await Promise.all(
+      Array.from(party.members.values()).map(async member => {
+        const player = await playerManager.fetchUUID(member.uuid);
+        this.player.apollo.addTeammate(
+          {
+            uuid: member.uuid,
+            displayName: player.username,
+            color: this.color,
+          },
+          false
+        );
+      })
+    );
+
+    this.player.apollo.sendTeammatesList();
+  };
+
   start(): void {
-    this.interval = setInterval(async () => {
-      if (!this.player.party.inParty) return;
-
-      await Promise.all(
-        Array.from(this.player.party.members.values()).map(async member => {
-          const player = await playerManager.fetchUUID(member.uuid);
-          this.player.apollo.addTeammate(
-            {
-              uuid: member.uuid,
-              displayName: player.username,
-              color: this.color,
-            },
-            false
-          );
-        })
-      );
-
-      this.player.apollo.sendTeammatesList();
-    }, 2000);
+    if (this.player.apollo.teamMembers.size) this.player.apollo.removeAllTeammates(true);
+    this.player.hypixel.on('partyInfo', this.listener);
   }
   stop(): void {
-    clearInterval(this.interval as any);
-    this.interval = null;
+    this.player.hypixel.off('partyInfo', this.listener);
+    this.player.apollo.removeAllTeammates(true);
   }
 }
 

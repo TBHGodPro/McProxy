@@ -112,11 +112,13 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
         map: data.map,
       });
     });
-    setInterval(async () => {
+    this.hypixel.on('partyInfo', party => {
+      this.party = party;
+    });
+    setInterval(() => {
       if (!this.isHypixel) return;
-      const res = await this.hypixel.getPartyInfo(5000);
-      if (res) this.party = res;
-    }, 5000);
+      this.hypixel.getPartyInfo(2000);
+    }, 2000);
 
     this.apollo = new ApolloPlayer({
       handling: {
