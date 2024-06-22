@@ -46,6 +46,10 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
   // NOT USED - Will add once inventory lib gets fixed
   public readonly inventory: prismarineWindow.Window = prismarineWindow.default('1.8.9').createWindow(0, 'minecraft:inventory', 'Inventory');
 
+  public get isConnected(): boolean {
+    return !!this.client;
+  }
+
   public get statusMessage(): string {
     return this.status?.online && this.status?.mode && this.status.game?.name
       ? `${

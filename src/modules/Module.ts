@@ -8,11 +8,13 @@ interface Module<S extends ModuleSettings> {
   disconnect?(): void;
   /** Run very often, essentially main loop */
   periodic?(): void;
+  /** Run once at the start of the process, not mattering if the module is enabled or not */
+  init?(): void;
   /** Run when module is started. Emitted on creation and whenever module is enabled */
   start?(): void;
   /** Run when module is being stopped, either because it was disabled, crashed, or the proxy was safe-exitted */
   stop?(): void;
-  /** Like stop, but run only when the proxy is safe-exitted (runs after stop) */
+  /** Run once at the end of the process (if safe-exitted), not mattering if the module is enabled or not */
   end?(): void;
 
   /** Optionally give the proxy your module's settings schema, for verifying settings */

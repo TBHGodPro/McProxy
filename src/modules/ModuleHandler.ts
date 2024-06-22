@@ -51,6 +51,8 @@ export default class ModuleHandler {
       const module = new c(this.player) as Module<any>;
 
       try {
+        module.init?.();
+
         const info = module.getModuleInfo();
 
         if (typeof info.id !== 'string' || this.modules.has(info.id)) throw new Error('Invalid Module ID or another Module with this ID Exists');
