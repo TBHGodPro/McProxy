@@ -236,7 +236,7 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
 
     // Load Features
 
-    this.commands.loadAll([CommandHandler.implDIR]);
+    this.commands.loadAll([CommandHandler.implDIR]); // TODO: custom command paths
     this.modules.loadAll([ModuleHandler.implDIR]); // TODO: custom module paths
 
     this.commands.setup(this);

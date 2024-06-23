@@ -76,7 +76,7 @@ export default class ModuleHandler {
         await ModuleManager.getModuleData(ref, false);
 
         if (!ModuleManager.verifySettings(ref, ref.settings).success) {
-          // TODO: Fix dynamic saving
+          // TODO: Fix dynamic saving of default settings
           await this.saveModuleData(ref, null, module.getDefaultSettings?.());
         }
 

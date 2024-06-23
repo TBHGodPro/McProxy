@@ -101,7 +101,7 @@ export default abstract class Command {
   }
 
   public sendCommandTip(error: boolean) {
-    // TODO
+    // TODO : Command tip
   }
 
   public abstract handle(data: CommandData): void;
