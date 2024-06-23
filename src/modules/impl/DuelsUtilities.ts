@@ -94,7 +94,7 @@ export default class DuelsUtilitiesModule extends Module<DuelsUtilitiesSettings>
         if (this.player.isInGameMode('DUELS_BRIDGE_')) {
           if (name === 'scoreboard_team') {
             if (packet.team.includes('w_') && packet.team.includes('_team_')) {
-              this.data.duelsHighlight.wasActive = false;
+              this.data.duelsHighlight.wasActive = true;
 
               this.data.duelsHighlight.teams[packet.team] ??= {
                 color: null,
