@@ -1,9 +1,20 @@
+import { UUID, parseUUID } from '@minecraft-js/uuid';
 import Module, { ModuleInfo, ModuleSettings, ModuleSettingsSchema } from '../Module';
+import { playerManager } from '../..';
 
 export default class DuelsUtilitiesModule extends Module<DuelsUtilitiesSettings> {
   public readonly data: { [key in keyof DuelsUtilitiesSettings]: any } = {
     betterBridgeHeightLimit: null,
     bridgePlayerTracker: null as null | 'Pos' | 'Neg',
+    duelsHighlight: { wasActive: false, teams: {} } as {
+      wasActive: boolean;
+      teams: {
+        [team: string]: {
+          color: 'RED' | 'BLUE' | null;
+          players: UUID[];
+        };
+      };
+    },
   };
 
   public getModuleInfo(): ModuleInfo {
@@ -20,12 +31,14 @@ export default class DuelsUtilitiesModule extends Module<DuelsUtilitiesSettings>
     return {
       betterBridgeHeightLimit: 'boolean',
       bridgePlayerTracker: 'boolean',
+      duelsHighlight: 'boolean',
     };
   }
 
   getDefaultSettings(): DuelsUtilitiesSettings {
     return {
       betterBridgeHeightLimit: true,
+      duelsHighlight: false,
       bridgePlayerTracker: false,
     };
   }
@@ -77,6 +90,63 @@ export default class DuelsUtilitiesModule extends Module<DuelsUtilitiesSettings>
         }, 250);
       }
 
+      if (['DUELS', 'SKYWARS'].includes(this.player.status?.game?.code!) && this.player.status?.mode !== 'LOBBY') {
+        if (this.player.isInGameMode('DUELS_BRIDGE_')) {
+          if (name === 'scoreboard_team') {
+            if (packet.team.includes('w_') && packet.team.includes('_team_')) {
+              this.data.duelsHighlight.wasActive = false;
+
+              this.data.duelsHighlight.teams[packet.team] ??= {
+                color: null,
+                players: [],
+              };
+
+              (async () => {
+                switch (packet.mode) {
+                  case 2:
+                    if (packet.prefix?.length) {
+                      if (packet.prefix === '§c') this.data.duelsHighlight.teams[packet.team].color = 'RED';
+                      else if (packet.prefix === '§9') this.data.duelsHighlight.teams[packet.team].color = 'BLUE';
+                    }
+                    break;
+
+                  case 3: {
+                    const fetched = await Promise.all(packet.players.map(i => playerManager.fetchUsername(i).catch(() => null)));
+
+                    for (const player of fetched) {
+                      if (!player) continue;
+                      const uuid = parseUUID(player.uuid);
+                      if (!this.data.duelsHighlight.teams[packet.team].players.includes(uuid)) this.data.duelsHighlight.teams[packet.team].players.push(uuid);
+                    }
+                    break;
+                  }
+
+                  case 4: {
+                    const fetched = await Promise.all(packet.players.map(i => playerManager.fetchUsername(i).catch(() => null)));
+
+                    for (const player of fetched) {
+                      if (!player) continue;
+                      const uuid = parseUUID(player.uuid);
+                      if (this.data.duelsHighlight.teams[packet.team].players.includes(uuid)) this.data.duelsHighlight.teams[packet.team].players.splice(this.data.duelsHighlight.teams[packet.team].players.indexOf(uuid), 1);
+                    }
+                    break;
+                  }
+                }
+              })();
+            }
+          }
+        } else {
+          if (name === 'player_info' && packet.action === 0 && this.enabled && this.settings.duelsHighlight) {
+            this.data.duelsHighlight.wasActive = true;
+            for (const p of packet.data) this.player.apollo.glowPlayer(parseUUID(p.UUID), 0xffffff);
+          }
+        }
+      } else if (this.enabled && this.settings.duelsHighlight && this.data.duelsHighlight.wasActive) {
+        this.player.apollo.removeAllGlow();
+        this.data.duelsHighlight.teams = {};
+        this.data.duelsHighlight.wasActive = false;
+      }
+
       if (!this.enabled) return;
     });
 
@@ -98,12 +168,38 @@ export default class DuelsUtilitiesModule extends Module<DuelsUtilitiesSettings>
         });
       }
     }, 50);
+
+    setInterval(() => {
+      if (!this.enabled) return;
+
+      if (this.settings.duelsHighlight && this.player.isInGameMode('DUELS_BRIDGE_')) {
+        for (const team in this.data.duelsHighlight.teams) {
+          const color = (colors as any)[this.data.duelsHighlight.teams[team].color];
+
+          for (const p of this.data.duelsHighlight.teams[team].players) {
+            this.player.apollo.glowPlayer(p, color);
+          }
+        }
+      }
+    }, 1000);
   }
 
   periodic(): void {}
+
+  start(): void {
+    if (this.settings.duelsHighlight)
+      try {
+        this.player.apollo.removeAllGlow();
+      } catch {}
+  }
+
+  stop(): void {
+    if (this.settings.duelsHighlight) this.player.apollo.removeAllGlow();
+  }
 }
 
 export interface DuelsUtilitiesSettings extends ModuleSettings {
   betterBridgeHeightLimit: boolean;
   bridgePlayerTracker: boolean;
+  duelsHighlight: boolean;
 }
