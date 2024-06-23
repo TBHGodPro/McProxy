@@ -39,10 +39,10 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
   public get username(): string | null {
     return this.client?.username ?? null;
   }
-  public location: Location | null = null;
-  public lastLocation: Location | null = null;
-  public direction: Direction | null = null;
-  public rawDirection: Direction | null = null;
+  public location: Location = { x: 0, y: 0, z: 0 };
+  public lastLocation: Location = { x: 0, y: 0, z: 0 };
+  public direction: Direction = { yaw: 0, pitch: 0 };
+  public rawDirection: Direction = { yaw: 0, pitch: 0 };
   // NOT USED - Will add once inventory lib gets fixed
   public readonly inventory: prismarineWindow.Window = prismarineWindow.default('1.8.9').createWindow(0, 'minecraft:inventory', 'Inventory');
 
@@ -316,6 +316,11 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
 
   public sendMessage(text: string): void {
     this.client?.write('chat', { message: JSON.stringify({ text }) });
+  }
+
+  public isInGameMode(gamemode: string): boolean {
+    if (this.status) return (this.status.mode?.toUpperCase().includes(gamemode.toUpperCase()) || this.status.game?.name?.toUpperCase().includes(gamemode.toUpperCase())) ?? false;
+    else return false;
   }
 }
 
