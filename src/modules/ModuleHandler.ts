@@ -92,10 +92,11 @@ export default class ModuleHandler {
     }
   }
 
-  public start() {
-    this.modules.forEach(module => {
-      if (module.enabled) module.module.start?.();
-    });
+  public start(event: boolean = true) {
+    if (event)
+      this.modules.forEach(module => {
+        if (module.enabled) module.module.start?.();
+      });
 
     this.periodic = setInterval(() => {
       this.modules.forEach(module => {
@@ -104,10 +105,11 @@ export default class ModuleHandler {
     });
   }
 
-  public stop() {
-    this.modules.forEach(module => {
-      if (module.enabled) module.module.stop?.();
-    });
+  public stop(event: boolean = true) {
+    if (event)
+      this.modules.forEach(module => {
+        if (module.enabled) module.module.stop?.();
+      });
 
     clearInterval(this.periodic as any);
     this.periodic = null;

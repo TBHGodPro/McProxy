@@ -10,28 +10,32 @@ export default class TestModule extends Module<TestModuleSettings> {
     };
   }
 
+  init(): void {
+    if (this.enabled) this.logger.info('INIT');
+  }
+
   start(): void {
-    this.logger.info('START');
+    if (this.enabled) this.logger.info('START');
   }
 
   stop(): void {
-    this.logger.info('STOP');
+    if (this.enabled) this.logger.info('STOP');
   }
 
   connect(): void {
-    this.logger.info('CONNECT');
+    if (this.enabled) this.logger.info('CONNECT');
   }
 
   disconnect(): void {
-    this.logger.info('DISCONNECT');
+    if (this.enabled) this.logger.info('DISCONNECT');
   }
 
   periodic(): void {
-    this.logger.debug('PERIODIC');
+    if (this.enabled) this.logger.debug('PERIODIC');
   }
 
   end(): void {
-    this.logger.info('END');
+    if (this.enabled) this.logger.info('END');
   }
 
   getSettingsSchema(): ModuleSettingsSchema {
@@ -70,12 +74,12 @@ export default class TestModule extends Module<TestModuleSettings> {
   }
 
   verifySettings(settings: ModuleSettings): boolean {
-    this.logger.debug('Asked to verify');
+    if (this.enabled) this.logger.debug('Asked to verify');
     return true;
   }
 
   updateSettings(settings: ModuleSettings): void {
-    this.logger.info('NEW SETTINGS', settings);
+    if (this.enabled) this.logger.info('NEW SETTINGS', settings);
   }
 }
 

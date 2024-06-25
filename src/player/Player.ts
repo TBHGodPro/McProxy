@@ -240,6 +240,7 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
     this.modules.loadAll([ModuleHandler.implDIR]); // TODO: custom module paths
 
     this.commands.setup(this);
+    this.modules.start(false);
   }
 
   public connect(toClient: ServerClient, toServer: Client) {
