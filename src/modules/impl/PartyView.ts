@@ -61,11 +61,16 @@ export default class PartyViewModule extends Module<PartyViewSettings> {
     this.player.apollo.sendTeammatesList();
   };
 
-  start(): void {
-    if (this.player.apollo.teamMembers.size) this.player.apollo.removeAllTeammates(true);
+  async start(): Promise<void> {
+    await this.player.apollo.onceReady();
+
+    this.player.apollo.removeAllTeammates(true);
     this.player.hypixel.on('partyInfo', this.listener);
   }
-  stop(): void {
+
+  async stop(): Promise<void> {
+    await this.player.apollo.onceReady();
+
     this.player.hypixel.off('partyInfo', this.listener);
     this.player.apollo.removeAllTeammates(true);
   }

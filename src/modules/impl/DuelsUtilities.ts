@@ -186,14 +186,15 @@ export default class DuelsUtilitiesModule extends Module<DuelsUtilitiesSettings>
 
   periodic(): void {}
 
-  start(): void {
-    if (this.settings.duelsHighlight)
-      try {
-        this.player.apollo.removeAllGlow();
-      } catch {}
+  async start(): Promise<void> {
+    await this.player.apollo.onceReady();
+
+    if (this.settings.duelsHighlight) this.player.apollo.removeAllGlow();
   }
 
-  stop(): void {
+  async stop(): Promise<void> {
+    await this.player.apollo.onceReady();
+
     if (this.settings.duelsHighlight) this.player.apollo.removeAllGlow();
   }
 }
