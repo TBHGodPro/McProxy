@@ -35,6 +35,8 @@ export type ListenerEvents = {
   client_move: (location: Location) => void;
   client_face: (direction: Direction, raw: Direction) => void;
   inventory_slot: (slot: number, item: Slot) => void;
+  player_state: (state: PlayerState) => void;
+  health: (name: string, health: number) => void;
 };
 
 export interface Location {
@@ -58,6 +60,7 @@ export interface IPlayer {
   uuid: string;
   entityId?: number;
   location?: Location;
+  health?: number;
 }
 
 export interface Party extends ClientboundPartyInfo {}
@@ -65,4 +68,10 @@ export interface Party extends ClientboundPartyInfo {}
 export interface APIPlayer {
   uuid: string;
   username: string;
+}
+
+export interface PlayerState {
+  health: number;
+  food: number;
+  saturation: number;
 }

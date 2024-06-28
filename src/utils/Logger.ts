@@ -18,19 +18,19 @@ export default class Logger {
   }
 
   public info(...args: any[]): void {
-    console.log(...this.getPrefix(), chalk.bgBlue.white(' INFO '), ...args);
+    console.log(...(this?.getPrefix() ?? {}), chalk.bgBlue.white(' INFO '), ...args);
   }
 
   public warn(...args: any[]): void {
-    console.warn(...this.getPrefix(), chalk.bgYellow.black(' WARN '), ...args);
+    console.warn(...(this?.getPrefix() ?? {}), chalk.bgYellow.black(' WARN '), ...args);
   }
 
   public error(...args: any[]): void {
-    console.error(...this.getPrefix(), chalk.bgRed.white(' ERROR '), ...args);
+    console.error(...(this?.getPrefix() ?? {}), chalk.bgRed.white(' ERROR '), ...args);
   }
 
   public debug(...args: any[]): void {
-    console.debug(...this.getPrefix(), chalk.bgGreen.white(' DEBUG '), ...args);
+    console.debug(...(this?.getPrefix() ?? {}), chalk.bgGreen.white(' DEBUG '), ...args);
   }
 
   public static info(...args: any[]): void {

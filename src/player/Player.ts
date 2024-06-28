@@ -1,4 +1,4 @@
-import EventEmitter from 'events';
+import EventEmitter, { once } from 'events';
 import { Client, ServerClient } from 'minecraft-protocol';
 import { InstantConnectProxy } from 'prismarine-proxy';
 import TypedEventEmitter from 'typed-emitter';
@@ -7,11 +7,13 @@ import { Client as ModAPIClient } from 'hypixel-mod-api-js';
 import { Player as ApolloPlayer } from 'lc-apollo-js';
 import PlayerListener from './PlayerListener';
 import { Status } from 'hypixel-api-reborn';
-import { Direction, IPlayer, Location, Party, Team } from '../Types';
+import { Direction, IPlayer, Location, Party, PlayerState, Team } from '../Types';
 import * as prismarineWindow from 'prismarine-windows';
 import ModuleHandler from '../modules/ModuleHandler';
 import CommandHandler from '../commands/CommandHandler';
 import { setTimeout as wait } from 'timers/promises';
+import { playerManager } from '..';
+import { UUID } from '@minecraft-js/uuid';
 
 export default class Player extends (EventEmitter as new () => TypedEventEmitter<PlayerEvents>) {
   public readonly proxy: PlayerProxy;
@@ -35,10 +37,12 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
   public teams: Team[] = [];
   public party: Party = { inParty: false, members: new Map() };
   public connectedPlayers: IPlayer[] = [];
+  public playerHealths: Map<string, number> = new Map();
   public uuid: string | null = null;
   public get username(): string | null {
     return this.client?.username ?? null;
   }
+  public state: PlayerState = { health: 20, food: 20, saturation: 20 };
   public location: Location = { x: 0, y: 0, z: 0 };
   public lastLocation: Location = { x: 0, y: 0, z: 0 };
   public direction: Direction = { yaw: 0, pitch: 0 };
@@ -172,6 +176,7 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
       this.connectedPlayers.push({
         uuid,
         name,
+        health: name ? this.playerHealths.get(name as string) ?? undefined : undefined,
       });
     });
 
@@ -232,6 +237,24 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
       const team = this.teams.find(team => team.name === name);
       if (team) team.players.push(...players);
       else this.teams.push({ name, players });
+    });
+    this.listener.on('player_state', state => {
+      this.state = state;
+    });
+    this.listener.on('health', async (name, health) => {
+      this.playerHealths.set(name, health);
+      const player = this.connectedPlayers.find(i => i.name === name);
+      if (player) player.health = health;
+      else {
+        const p = {
+          name,
+          health,
+        } as any;
+        this.connectedPlayers.push(p);
+        const uuid = (await playerManager.fetchUsername(name).catch(i => null))?.uuid;
+        if (uuid) p.uuid = uuid;
+        else this.connectedPlayers.splice(this.connectedPlayers.indexOf(p, 1));
+      }
     });
 
     // Load Features

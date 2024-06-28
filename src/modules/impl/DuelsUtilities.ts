@@ -6,8 +6,9 @@ export default class DuelsUtilitiesModule extends Module<DuelsUtilitiesSettings>
   public readonly data: { [key in keyof DuelsUtilitiesSettings]: any } = {
     betterBridgeHeightLimit: null,
     bridgePlayerTracker: null as null | 'Pos' | 'Neg',
-    duelsHighlight: { wasActive: false, teams: {} } as {
+    duelsHighlight: { wasActive: false, players: [], teams: {} } as {
       wasActive: boolean;
+      players: UUID[];
       teams: {
         [team: string]: {
           color: 'RED' | 'BLUE' | null;
@@ -92,6 +93,7 @@ export default class DuelsUtilitiesModule extends Module<DuelsUtilitiesSettings>
 
       if (['DUELS', 'SKYWARS'].includes(this.player.status?.game?.code!) && this.player.status?.mode !== 'LOBBY') {
         if (this.player.isInGameMode('DUELS_BRIDGE_')) {
+          this.data.duelsHighlight.players = [];
           if (name === 'scoreboard_team') {
             if (packet.team.includes('w_') && packet.team.includes('_team_')) {
               this.data.duelsHighlight.wasActive = true;
@@ -136,14 +138,16 @@ export default class DuelsUtilitiesModule extends Module<DuelsUtilitiesSettings>
             }
           }
         } else {
+          this.data.duelsHighlight.teams = {};
           if (name === 'player_info' && packet.action === 0 && this.enabled && this.settings.duelsHighlight) {
             this.data.duelsHighlight.wasActive = true;
-            for (const p of packet.data) this.player.apollo.glowPlayer(parseUUID(p.UUID), 0xffffff);
+            for (const p of packet.data) this.data.duelsHighlight.players.push(parseUUID(p.UUID));
           }
         }
       } else if (this.enabled && this.settings.duelsHighlight && this.data.duelsHighlight.wasActive) {
         this.player.apollo.removeAllGlow();
         this.data.duelsHighlight.teams = {};
+        this.data.duelsHighlight.players = [];
         this.data.duelsHighlight.wasActive = false;
       }
 
@@ -172,12 +176,27 @@ export default class DuelsUtilitiesModule extends Module<DuelsUtilitiesSettings>
     setInterval(() => {
       if (!this.enabled) return;
 
-      if (this.settings.duelsHighlight && this.player.isInGameMode('DUELS_BRIDGE_')) {
-        for (const team in this.data.duelsHighlight.teams) {
-          const color = (colors as any)[this.data.duelsHighlight.teams[team].color];
+      if (this.settings.duelsHighlight) {
+        if (this.player.isInGameMode('DUELS_BRIDGE_')) {
+          for (const team in this.data.duelsHighlight.teams) {
+            const color = (colors as any)[this.data.duelsHighlight.teams[team].color];
 
-          for (const p of this.data.duelsHighlight.teams[team].players) {
-            this.player.apollo.glowPlayer(p, color);
+            for (const p of this.data.duelsHighlight.teams[team].players) {
+              this.player.apollo.glowPlayer(p, color);
+            }
+          }
+        } else {
+          for (const uuid of this.data.duelsHighlight.players as UUID[]) {
+            const p = this.player.connectedPlayers.find(i => uuid.toString(true) == i.uuid);
+            if (!p) continue;
+            let health: number | null = p.health ?? null;
+
+            if (health) health = Math.min(Math.max(health, 0), 20);
+
+            const colorHex = health !== null ? `${Math.min(255, 510 - Math.round(health * (510 / 20))).toString(16)}${Math.min(255, Math.round(health * (510 / 20))).toString(16)}00` : 'ffffff';
+            const color = parseInt(colorHex, 16);
+
+            this.player.apollo.glowPlayer(uuid, color);
           }
         }
       }

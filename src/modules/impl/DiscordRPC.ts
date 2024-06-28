@@ -19,7 +19,7 @@ export default class DiscordRPCModule extends Module<DiscordRPCSettings> {
   public connected: boolean = false;
 
   public async init(): Promise<void> {
-    const res = await this.client.login({ clientId: DiscordRPCModule.clientId }).catch(this.logger.error);
+    const res = await this.client.login({ clientId: DiscordRPCModule.clientId }).catch(err => this.logger.error(err.message));
 
     this.connected = !!res;
 
@@ -45,7 +45,7 @@ export default class DiscordRPCModule extends Module<DiscordRPCSettings> {
     this.client
       .clearActivity()
       .then(() => this.logger.debug('Disabled'))
-      .catch(this.logger.error);
+      .catch(err => this.logger.error(err.message));
   }
 
   private last: string = '';
@@ -80,7 +80,7 @@ export default class DiscordRPCModule extends Module<DiscordRPCSettings> {
     if (!force && string === this.last) return;
     this.last = string;
 
-    await this.client.setActivity(info).catch(this.logger.error);
+    await this.client.setActivity(info).catch(err => this.logger.error(err.message));
   }
 
   getSettingsSchema(): ModuleSettingsSchema {
