@@ -82,7 +82,7 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
     this.proxy = new PlayerProxy(this);
     this.proxy.setup();
 
-    this.listener = new PlayerListener(this.proxy);
+    this.listener = new PlayerListener(this.proxy, this);
 
     this.modules = new ModuleHandler(this);
     this.commands = new CommandHandler();

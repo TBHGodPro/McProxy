@@ -3,6 +3,7 @@ import TypedEmitter from 'typed-emitter';
 import { Direction, ListenerEvents, Location } from '../Types';
 import PlayerProxy from './PlayerProxy';
 import Logger from '../utils/Logger';
+import Player from './Player';
 
 export function parseLocation(data: Location) {
   return {
@@ -25,7 +26,7 @@ export function parseDirection(data: Direction) {
 }
 
 export default class PlayerListener extends (EventEmitter as new () => TypedEmitter<ListenerEvents>) {
-  public constructor(proxyHandler: PlayerProxy) {
+  public constructor(proxyHandler: PlayerProxy, player: Player) {
     super();
     proxyHandler.on('start', (toClient, toServer) => this.emit('switch_server', toServer));
 
@@ -126,20 +127,11 @@ export default class PlayerListener extends (EventEmitter as new () => TypedEmit
             pitch: data.pitch,
           });
       }
-
-      // Will add once inventory lib gets fixed
       // if (name === 'set_slot' && data.windowId === 0) {
       //   player.inventory.updateSlot(
       //     data.slot,
       //     // @ts-ignore
-      //     new (Item('1.8.9'))(
-      //       data.item.blockId,
-      //       data.item.itemCount,
-      //       data.item.itemDamage,
-      //       data.item.nbtData,
-      //       null,
-      //       true
-      //     )
+      //     new (Item('1.8.9'))(data.item.blockId, data.item.itemCount, data.item.itemDamage, data.item.nbtData, null, true)
       //   );
       // }
     });
@@ -158,7 +150,6 @@ export default class PlayerListener extends (EventEmitter as new () => TypedEmit
           pitch: data.pitch,
         });
       }
-      // Will add once inventory lib gets fixed
       // if (name === 'window_click') {
       //   player.inventory.acceptClick(
       //     {

@@ -4,3 +4,5 @@ dist/
 
 config.json
 config.jsonc
+
+packetDump*.json
