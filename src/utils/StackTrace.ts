@@ -20,22 +20,16 @@ export default class StackTrace {
     return stack;
   }
 
-  public getCaller(levels: number): string {
+  public getCaller(levels: number, debug: boolean = false): string {
     const stack = this.getStack();
 
-    // @ts-ignore
-    return stack[levels + 2].getFileName();
-  }
-
-  public getCallerDebug(levels: number): string {
-    const stack = this.getStack();
-
-    console.log(
+    if (debug)
+      console.log(
         // @ts-ignore
-      stack.map(i => i.getFileName()),
-      // @ts-ignore
-      stack[levels + 2].getFileName()
-    );
+        stack.map(i => i.getFileName()),
+        // @ts-ignore
+        stack[levels + 2].getFileName()
+      );
 
     // @ts-ignore
     return stack[levels + 2].getFileName();

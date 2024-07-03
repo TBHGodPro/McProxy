@@ -195,7 +195,7 @@ export default class DuelsUtilitiesModule extends Module<DuelsUtilitiesSettings>
 
             const colorHex = health !== null ? `${Math.min(255, 510 - Math.round(health * (510 / 20))).toString(16)}${Math.min(255, Math.round(health * (510 / 20))).toString(16)}00` : 'ffffff';
             const color = parseInt(colorHex, 16);
-
+            
             this.player.apollo.glowPlayer(uuid, color);
           }
         }

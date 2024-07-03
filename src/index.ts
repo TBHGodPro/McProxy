@@ -6,7 +6,7 @@ import { NIL } from 'uuid';
 import Player from './player/Player';
 import PlayerManager from './utils/PlayerManager';
 
-if (process.version.split('.')[0] !== 'v18') throw new Error('Must use Node.JS v20! (Using ' + process.version + ')');
+if (process.version.split('.')[0] !== 'v18') throw new Error('Must use Node.JS v18! (Using ' + process.version + ')');
 
 const version = JSONUtil.readFileSync<any>('../package.json')?.version;
 if (!version) throw new Error('No package.json found!');

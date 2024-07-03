@@ -37,7 +37,7 @@ export default class BedwarsUtilitiesModule extends Module<BedwarsUtilitiesSetti
     this.player.proxy.on('fromServer', ({ data: packet, name }, toClient, toServer) => {
       if (this.player.status?.game?.code === 'BEDWARS' && this.player.status.mode !== 'LOBBY' && name === 'scoreboard_team') {
         const team = packet.team.replace(/[0-9]/g, '').toLowerCase();
-        if (colors[team.toUpperCase() as keyof typeof colors] === undefined) return;
+        if (colors[team.toUpperCase()] === undefined) return;
         this.data.playerHighlight[team] ??= [];
 
         if (packet.mode === 3) {
@@ -78,7 +78,7 @@ export default class BedwarsUtilitiesModule extends Module<BedwarsUtilitiesSetti
 
       if (this.settings.playerHighlight) {
         for (const team in this.data.playerHighlight) {
-          const color = colors[team.toUpperCase() as keyof typeof colors];
+          const color = colors[team.toUpperCase()];
 
           for (const p of this.data.playerHighlight[team]) {
             this.player.apollo.glowPlayer(p, color);
