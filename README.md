@@ -1,5 +1,6 @@
 <p align="center">
     <img src="./assets/Brand.png" />
+    <br/>
     <b><i>MINECRAFT PROXY FOR HYPIXEL</i></b>
 </p>
 
@@ -41,4 +42,4 @@ pnpm start
 
 There are a multitude of modules already built-in, but module developers can add their own typescript/javascript modules. They just have to export an extension of the `Module` abstract class that implements anything necessary, and you're ready to go!
 
-*(Module management coming soon)*
+_(Module management coming soon)_
