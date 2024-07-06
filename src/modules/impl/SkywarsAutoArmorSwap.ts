@@ -14,7 +14,11 @@ export default class SkywarsAutoArmorSwapModule extends Module<SkywarsAutoArmorS
 
   getSettingsSchema(): ModuleSettingsSchema {
     return {
-      usePause: 'boolean',
+      pauseTimeMS: {
+        type: 'range',
+        min: -1,
+        max: 1000,
+      },
       minProtForUpgrade: {
         type: 'range',
         min: 1,
@@ -25,7 +29,7 @@ export default class SkywarsAutoArmorSwapModule extends Module<SkywarsAutoArmorS
 
   getDefaultSettings(): SkywarsAutoArmorSwapSettings {
     return {
-      usePause: true,
+      pauseTimeMS: 500,
       minProtForUpgrade: 2,
     };
   }
@@ -118,13 +122,13 @@ export default class SkywarsAutoArmorSwapModule extends Module<SkywarsAutoArmorS
 
           if (!item) return;
 
-          const best = this.getBest(item, (this.wearing as any)[item.piece]);
+          const best = this.getBest((this.wearing as any)[item.piece], item);
 
           if (best !== this.wearing[item.piece]) {
             // console.log('REPLACE', wearing[item.piece], 'WITH', best);
             const hasItem = !!this.wearing[item.piece];
 
-            if (this.settings.usePause) this.isSwitching = true;
+            if (this.settings.pauseTimeMS >= 0) this.isSwitching = true;
 
             this.wearing[item.piece] = {
               ...item,
@@ -230,7 +234,7 @@ export default class SkywarsAutoArmorSwapModule extends Module<SkywarsAutoArmorS
 }
 
 interface SkywarsAutoArmorSwapSettings extends ModuleSettings {
-  usePause: boolean;
+  pauseTimeMS: number;
   minProtForUpgrade: number;
 }
 
