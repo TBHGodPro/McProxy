@@ -4,8 +4,8 @@ import Command, { CommandData } from '../Command';
 export default class DumpPackets extends Command {
   constructor() {
     super({
-      name: 'dump-packets',
-      aliases: ['dp', 'dumppackets', 'packet-dump', 'packetdump', 'packetsdump', 'packetsdump'],
+      commands: ['dp', 'dump-packets', 'dumppackets', 'packet-dump', 'packetdump', 'packets-dump', 'packetsdump', 'mcproxy:dp', 'mcproxy:dump', 'mcproxy:dump-packets', 'mcproxy:dumppackets', 'mcproxy:packet-dump', 'mcproxy:packetdump', 'mcproxy:packets-dump', 'mcproxy:packetsdump'],
+      description: 'Dump incoming and outgoing packets into a packetDump.json file',
       args: [
         {
           type: 'number',
@@ -15,7 +15,7 @@ export default class DumpPackets extends Command {
     });
   }
 
-  public handle(data: CommandData): void {
+  public handle(data: CommandData) {
     const ms = data.args[0].value as number;
     if (ms <= 0) return;
     const packets: {

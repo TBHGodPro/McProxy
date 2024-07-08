@@ -26,8 +26,8 @@ importers:
         specifier: ^4.0.1
         version: 4.0.1
       hypixel-api-reborn:
-        specifier: ^11.2.0
-        version: 11.2.0
+        specifier: ^11.2.1
+        version: 11.2.1
       hypixel-mod-api-js:
         specifier: ../Hypixel Mod API JS
         version: link:../Hypixel Mod API JS
@@ -251,9 +251,9 @@ packages:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
     engines: {node: '>=8'}
 
-  hypixel-api-reborn@11.2.0:
-    resolution: {integrity: sha512-uRszCuv2w5VKMkfrVDcCfKUWytHY2WCaY1gJXPztOV7VJNqjSJQZt7OCSUD4LzGymMyTEO7zVaS1wfhGf8JGTA==}
-    engines: {node: '>=14.0.0'}
+  hypixel-api-reborn@11.2.1:
+    resolution: {integrity: sha512-8bzTe6ILnHJymnTNcB0DOo2La/Wr/wmQFtrBfyHoFOJBvhxdRmoC5UdHJab0ufbpXfBJcfWNkbINlCcYeki+Xw==}
+    engines: {node: '>=18.18.0'}
 
   ieee754@1.2.1:
     resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
@@ -379,10 +379,6 @@ packages:
 
   node-rsa@1.1.1:
     resolution: {integrity: sha512-Jd4cvbJMryN21r5HgxQOpMEqv+ooke/korixNNK3mGqfGJmy0M77WDDzo/05969+OkMy3XW1UuZsSmW9KQm7Fw==}
-
-  object-path@0.11.8:
-    resolution: {integrity: sha512-YJjNZrlXJFM42wTBn6zgOJVar9KFJvzx6sTWDte8sWZF//cnjl0BxHNpfZx+ZffXX63A9q0b1zsFiBX4g4X5KA==}
-    engines: {node: '>= 10.12.0'}
 
   prismarine-auth@2.5.0:
     resolution: {integrity: sha512-CRv/pL6d/T+4cdjWS223PXG+ygHbz40Kef04L59SLMT+axNdAQro23eZZhgiIIu6u7rlvJcZYlIY93gFNtKxXA==}
@@ -730,11 +726,10 @@ snapshots:
 
   has-flag@4.0.0: {}
 
-  hypixel-api-reborn@11.2.0:
+  hypixel-api-reborn@11.2.1:
     dependencies:
       node-cache: 5.1.2
       node-fetch: 3.3.2
-      object-path: 0.11.8
       prismarine-nbt: 2.5.0
       rss-parser: 3.13.0
       skyhelper-networth: 1.20.0
@@ -877,8 +872,6 @@ snapshots:
   node-rsa@1.1.1:
     dependencies:
       asn1: 0.2.6
-
-  object-path@0.11.8: {}
 
   prismarine-auth@2.5.0:
     dependencies:

@@ -16,11 +16,10 @@ export default abstract class Command {
   constructor(config: CommandConfig) {
     this.player = player;
 
-    if (typeof config.name !== 'string') throw new Error('Command Name should be a string!');
-    if (config.aliases && config.aliases.find(i => typeof i !== 'string')) throw new Error('All Command Aliases should be strings!');
+    if (!config.commands?.length) throw new Error('Commands must have at least one registered command name!');
+    if (config.commands.find(i => typeof i !== 'string')) throw new Error('All Command Aliases should be strings!');
 
-    config.name = config.name.toLowerCase().trim();
-    config.aliases = config.aliases?.map(i => i.toLowerCase().trim()) ?? [];
+    config.commands = config.commands?.map(i => i.toLowerCase().trim()) ?? [];
 
     if (config.args) {
       let hasHadOptionalArg = false;
@@ -43,7 +42,7 @@ export default abstract class Command {
   }
 
   public handleIncoming(command: RawCommandData) {
-    if (this.config.name === command.command || this.config.aliases!.includes(command.command)) {
+    if (this.config.commands.includes(command.command)) {
       let finalArgs: CommandData['args'] = [];
 
       if (this.config.args?.length) {
@@ -104,13 +103,13 @@ export default abstract class Command {
     // TODO : Command tip
   }
 
-  public abstract handle(data: CommandData): void;
+  public abstract handle(data: CommandData): any;
 }
 
 export interface CommandConfig {
-  name: string;
+  commands: string[];
+  description: string;
   args?: CommandArg[];
-  aliases?: string[];
 }
 
 export type CommandArgTypes = 'string' | 'number' | 'boolean';

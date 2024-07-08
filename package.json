@@ -4,8 +4,9 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "node .",
-    "build": "tsc",
-    "dev": "npm run build && npm start"
+    "build": "npm run clean && tsc",
+    "dev": "npm run build && npm start",
+    "clean": "node scripts/clean.js"
   },
   "author": "TBHGodPro",
   "license": "ISC",
@@ -22,7 +23,7 @@
     "@minecraft-js/uuid": "^1.0.3",
     "axios": "^1.7.2",
     "discord-rpc": "^4.0.1",
-    "hypixel-api-reborn": "^11.2.0",
+    "hypixel-api-reborn": "^11.2.1",
     "hypixel-mod-api-js": "../Hypixel Mod API JS",
     "jsonschema": "^1.4.1",
     "lc-apollo-js": "../LC-Apollo-JS",

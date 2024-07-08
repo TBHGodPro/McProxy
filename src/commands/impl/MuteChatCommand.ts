@@ -3,8 +3,8 @@ import Command, { CommandData } from '../Command';
 export default class MuteChatCommand extends Command {
   constructor() {
     super({
-      name: 'mute-chat',
-      aliases: ['mutechat'],
+      commands: ['mute-chat', 'mutechat'],
+      description: 'Mute chat messages from other players, except ones that you might be interested in',
       args: [
         {
           type: 'boolean',
@@ -26,7 +26,7 @@ export default class MuteChatCommand extends Command {
 
   private muted: boolean = false;
 
-  public handle(data: CommandData): void {
+  public handle(data: CommandData) {
     this.muted = (data.args[0]?.value as boolean) ?? !this.muted;
 
     this.player.sendMessage(`\n    ${this.muted ? '§cMuted' : '§aUnmuted'} the chat!\n`);

@@ -8,7 +8,7 @@ import PlayerManager from './utils/PlayerManager';
 
 if (process.version.split('.')[0] !== 'v18') throw new Error('Must use Node.JS v18! (Using ' + process.version + ')');
 
-const version = JSONUtil.readFileSync<any>('../package.json')?.version;
+export const version = JSONUtil.readFileSync<any>('../package.json')?.version;
 if (!version) throw new Error('No package.json found!');
 
 if (!/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/.test(config.cached.apiKey)) {

@@ -68,7 +68,7 @@ export default class CommandHandler {
         const commandName = parts[0].toLowerCase();
         const args = parts.slice(1);
 
-        const command = this.commands.find(i => i.config.name === commandName || i.config.aliases?.includes(commandName));
+        const command = this.commands.find(i => i.config.commands.includes(commandName));
 
         if (!command) return true;
 
