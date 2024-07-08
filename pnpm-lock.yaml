@@ -29,14 +29,14 @@ importers:
         specifier: ^11.2.1
         version: 11.2.1
       hypixel-mod-api-js:
-        specifier: ../Hypixel Mod API JS
+        specifier: link:../Hypixel Mod API JS
         version: link:../Hypixel Mod API JS
       jsonschema:
         specifier: ^1.4.1
         version: 1.4.1
       lc-apollo-js:
-        specifier: ../LC-Apollo-JS
-        version: link:../LC-Apollo-JS
+        specifier: ^1.0.6
+        version: 1.0.6
       minecraft-protocol:
         specifier: ^1.47.0
         version: 1.47.0(patch_hash=gz4x3njzkamxsjqw63pi7emf6a)
@@ -60,7 +60,7 @@ importers:
         specifier: ^4.0.8
         version: 4.0.8
       '@types/node':
-        specifier: ^20.12.8
+        specifier: ^20.14.5
         version: 20.14.5
       '@types/uuid':
         specifier: ^9.0.8
@@ -84,6 +84,14 @@ packages:
   '@azure/msal-node@2.9.2':
     resolution: {integrity: sha512-8tvi6Cos3m+0KmRbPjgkySXi+UQU/QiuVRFnrxIwt5xZlEEFa69O04RTaNESGgImyBBlYbo2mfE8/U8Bbdk1WQ==}
     engines: {node: '>=16'}
+
+  '@buf/lunarclient_apollo.bufbuild_es@1.9.0-20240525042717-1da7022e8b79.2':
+    resolution: {tarball: https://buf.build/gen/npm/v1/@buf/lunarclient_apollo.bufbuild_es/-/lunarclient_apollo.bufbuild_es-1.9.0-20240525042717-1da7022e8b79.2.tgz}
+    peerDependencies:
+      '@bufbuild/protobuf': ^1.9.0
+
+  '@bufbuild/protobuf@1.10.0':
+    resolution: {integrity: sha512-QDdVFLoN93Zjg36NoQPZfsVH9tZew7wKDKyV5qRdj8ntT4wQCOradQjRaTdwMhWUYsgKsvCINKKm87FdEk96Ag==}
 
   '@minecraft-js/uuid@1.0.3':
     resolution: {integrity: sha512-IOomvwaBUGctcSreU2QFLwlQoFyJItBrsEt9sMFylg7+cyuS7IwoMFvbbfeC3uFrfmudQQqD8/TUOG4zcbHGVg==}
@@ -279,6 +287,9 @@ packages:
 
   jws@3.2.2:
     resolution: {integrity: sha512-YHlZCB6lMTllWDtSPHz/ZXTsi8S00usEV6v1tjq8tOUZzw7DpSDWVXjXDre6ed1w/pd495ODpHZYSdkRTsa0HA==}
+
+  lc-apollo-js@1.0.6:
+    resolution: {integrity: sha512-JSss34TNBQxOkWbY5G+NJ8NUrbbbIHh7Xyn7cgpAp07iHPPOH8c35fJRN5+XgT/hgceIXRYj6Ix0RgRtHFJH4w==}
 
   lodash.get@4.4.2:
     resolution: {integrity: sha512-z+Uw/vLuy6gQe8cfaFWD7p0wVv8fJl3mbzXh33RS+0oW2wvUqiRXiQ69gLWSLpgB5/6sU+r6BlQR0MBILadqTQ==}
@@ -563,6 +574,12 @@ snapshots:
       jsonwebtoken: 9.0.2
       uuid: 8.3.2
 
+  '@buf/lunarclient_apollo.bufbuild_es@1.9.0-20240525042717-1da7022e8b79.2(@bufbuild/protobuf@1.10.0)':
+    dependencies:
+      '@bufbuild/protobuf': 1.10.0
+
+  '@bufbuild/protobuf@1.10.0': {}
+
   '@minecraft-js/uuid@1.0.3': {}
 
   '@types/discord-rpc@4.0.8':
@@ -769,6 +786,12 @@ snapshots:
     dependencies:
       jwa: 1.4.1
       safe-buffer: 5.2.1
+
+  lc-apollo-js@1.0.6:
+    dependencies:
+      '@buf/lunarclient_apollo.bufbuild_es': 1.9.0-20240525042717-1da7022e8b79.2(@bufbuild/protobuf@1.10.0)
+      '@bufbuild/protobuf': 1.10.0
+      '@minecraft-js/uuid': 1.0.3
 
   lodash.get@4.4.2: {}
 
