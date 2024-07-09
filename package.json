@@ -26,7 +26,7 @@
     "hypixel-api-reborn": "^11.2.1",
     "hypixel-mod-api-js": "link:../Hypixel Mod API JS",
     "jsonschema": "^1.4.1",
-    "lc-apollo-js": "^1.0.6",
+    "lc-apollo-js": "^1.0.7",
     "minecraft-protocol": "^1.47.0",
     "node-rsa": "^1.1.1",
     "prismarine-proxy": "^1.1.4",

@@ -146,6 +146,9 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
         },
       },
     });
+    this.apollo.on('handshake', data => {
+      Logger.info(`Connected on Lunar Client! (${data.lunarClientVersion?.semver} - ${data.minecraftVersion?.enum})`);
+    });
 
     this.proxy.on('fromServer', ({ data, name }) => {
       if (name === 'player_info' && data.action === 2 && data.data.find(i => i.UUID === this.uuid)) {
@@ -283,33 +286,33 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
     this.modules.connect();
 
     this.apollo.connect();
-    this.apollo.configureSettings(
-      {
-        target: 'staff_mod',
-        case: 'apolloModule',
-        enabled: true,
-      },
-      {
-        target: 'notification',
-        case: 'apolloModule',
-        enabled: true,
-      },
-      {
-        target: 'team',
-        case: 'apolloModule',
-        enabled: true,
-      },
-      {
-        target: 'glow',
-        case: 'apolloModule',
-        enabled: true,
-      },
-      {
-        target: 'cooldown',
-        case: 'apolloModule',
-        enabled: true,
-      }
-    );
+    // this.apollo.configureSettings(
+    //   {
+    //     target: 'staff_mod',
+    //     case: 'apolloModule',
+    //     enabled: true,
+    //   },
+    //   {
+    //     target: 'notification',
+    //     case: 'apolloModule',
+    //     enabled: true,
+    //   },
+    //   {
+    //     target: 'team',
+    //     case: 'apolloModule',
+    //     enabled: true,
+    //   },
+    //   {
+    //     target: 'glow',
+    //     case: 'apolloModule',
+    //     enabled: true,
+    //   },
+    //   {
+    //     target: 'cooldown',
+    //     case: 'apolloModule',
+    //     enabled: true,
+    //   }
+    // );
   }
 
   public disconnect() {
