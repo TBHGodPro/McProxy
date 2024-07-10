@@ -47,18 +47,24 @@ export default class MurderMysteryCheatsModule extends Module<MurderMysteryCheat
           const target = this.player.connectedPlayers.find(i => i.entityId === data.entityId);
           if (!target) return;
 
-          this.player.apollo.showNotification('Bow User', target.name ? `${target.name} has a bow!` : 'A Player has a bow!', { durationMS: 2000 });
+          const uuid = parseUUID(target.uuid).toString(true);
+          if (this.roles.get(uuid) !== Role.MURDERER) {
+            this.roles.set(uuid, Role.BOW);
 
-          this.roles.set(parseUUID(target.uuid).toString(true), Role.BOW);
+            this.player.apollo.showNotification('Bow User', target.name ? `${target.name} has a bow!` : 'A Player has a bow!', { durationMS: 2000 });
+          }
         }
 
         if (knives.includes(data.item.blockId)) {
           const target = this.player.connectedPlayers.find(i => i.entityId === data.entityId);
           if (!target) return;
 
-          this.player.apollo.showNotification('Murderer', target.name ? `${target.name} is the Murderer!` : 'The Murderer has been Identified!', { durationMS: 2000 });
+          const uuid = parseUUID(target.uuid).toString(true);
+          if (this.roles.get(uuid) !== Role.BOW) {
+            this.roles.set(uuid, Role.MURDERER);
 
-          this.roles.set(parseUUID(target.uuid).toString(true), Role.MURDERER);
+            this.player.apollo.showNotification('Murderer', target.name ? `${target.name} is the Murderer!` : 'The Murderer has been Identified!', { durationMS: 2000 });
+          }
         }
       }
 
