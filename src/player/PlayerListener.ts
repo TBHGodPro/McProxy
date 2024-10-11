@@ -30,6 +30,9 @@ export function parseDirection(data: Direction) {
 export default class PlayerListener extends (EventEmitter as new () => TypedEmitter<ListenerEvents>) {
   public constructor(proxyHandler: PlayerProxy, player: Player) {
     super();
+
+    this.setMaxListeners(0);
+
     proxyHandler.on('start', (toClient, toServer) => this.emit('switch_server', toServer));
 
     proxyHandler.on('fromServer', ({ name, data }) => {

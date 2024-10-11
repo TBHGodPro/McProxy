@@ -26,6 +26,8 @@ export default class PlayerProxy extends (EventEmitter as new () => TypedEventEm
   constructor(player: Player) {
     super();
 
+    this.setMaxListeners(0);
+
     this.player = player;
   }
 

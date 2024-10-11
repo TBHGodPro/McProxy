@@ -80,6 +80,8 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
   constructor(proxy: InstantConnectProxy) {
     super();
 
+    this.setMaxListeners(0);
+
     // Classes
 
     this.rawProxy = proxy;
@@ -119,6 +121,7 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
         mode: data.mode ?? (data.lobbyName ? 'LOBBY' : null),
         map: data.map,
       });
+      if (this.status.mode !== 'LOBBY') this.lastGameMode = this.status.mode ?? null;
     });
     this.hypixel.on('partyInfo', party => {
       this.party = party;
@@ -345,6 +348,9 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
     this.client?.write('chat', { message: JSON.stringify({ text }) });
   }
 
+  public executeCommand(command: string): void {
+    this.server?.write('chat', { message: command });
+  }
   public isInGameMode(gamemode: string): boolean {
     if (this.status) return (this.status.mode?.toUpperCase().includes(gamemode.toUpperCase()) || this.status.game?.name?.toUpperCase().includes(gamemode.toUpperCase())) ?? false;
     else return false;
