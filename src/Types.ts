@@ -27,13 +27,14 @@ export type ListenerEvents = {
   player_join: (uuid: string, username?: string) => void;
   player_spawn: (uuid: string, entityId: number, location: Location) => void;
   player_leave: (entityId: number) => void;
-  entity_teleport: (entityId: number, location: Location) => void;
-  entity_move: (entityId: number, difference: Location) => void;
+  entity_teleport: (entityId: number, location: Location, onGround: boolean) => void;
+  entity_move: (entityId: number, difference: Location, onGround: boolean) => void;
+  entity_look: (entityId: number, direction: Direction, raw: Direction, onGround?: boolean) => void;
   entity_velocity: (entityId: number, velocity: Location) => void;
   title: (action: number, text?: string, fadeIn?: number, stay?: number, fadeOut?: number) => void;
   action_bar: (message: object) => void;
-  client_move: (location: Location) => void;
-  client_face: (direction: Direction, raw: Direction) => void;
+  client_move: (location: Location, onGround?: boolean) => void;
+  client_face: (direction: Direction, raw: Direction, onGround?: boolean) => void;
   inventory_slot: (slot: number, item: Slot) => void;
   player_state: (state: PlayerState) => void;
   health: (name: string, health: number) => void;
@@ -60,7 +61,11 @@ export interface IPlayer {
   uuid: string;
   entityId?: number;
   location?: Location;
+  velocity?: Location;
+  direction?: Direction;
+  rawDirection?: Direction;
   health?: number;
+  onGround?: boolean;
 }
 
 export interface Party extends ClientboundPartyInfo {}

@@ -15,10 +15,12 @@
     "allowJs": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "*": ["types/*.d.ts"]
+      "src/*": ["./src/*"]
     },
+    "types": ["./types/globals.d.ts", "./types/prismarine-physics.d.ts"],
     "baseUrl": ".",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "plugins": [{ "transform": "typescript-transform-paths" }]
   },
   "include": ["src", "types/globals.d.ts"],
   "exclude": ["node_modules"]

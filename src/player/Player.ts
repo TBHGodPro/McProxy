@@ -13,7 +13,8 @@ import ModuleHandler from '../modules/ModuleHandler';
 import CommandHandler from '../commands/CommandHandler';
 import { setTimeout as wait } from 'timers/promises';
 import { playerManager } from '..';
-import { UUID } from '@minecraft-js/uuid';
+import { Physics } from 'prismarine-physics';
+import Utils from 'src/utils/Utils';
 
 export default class Player extends (EventEmitter as new () => TypedEventEmitter<PlayerEvents>) {
   public readonly proxy: PlayerProxy;
@@ -47,6 +48,7 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
   public lastLocation: Location = { x: 0, y: 0, z: 0 };
   public direction: Direction = { yaw: 0, pitch: 0 };
   public rawDirection: Direction = { yaw: 0, pitch: 0 };
+  public onGround: boolean = true;
   // NOT USED - Will add once inventory lib gets fixed
   public readonly inventory: prismarineWindow.Window = prismarineWindow.default('1.8.9').createWindow(0, 'minecraft:inventory', 'Inventory');
 
@@ -81,6 +83,20 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
     super();
 
     this.setMaxListeners(0);
+
+    // Physics
+    // const physics = Physics(require('minecraft-data')('1.8.9'));
+    // setInterval(() => {
+    //   for (const p of this.connectedPlayers) {
+    //     const state = Utils.getPrismarinePlayerState(p);
+
+    //     if (!state) continue;
+
+    //     console.log(state);
+    //     physics.simulatePlayer(state, null).apply(state.player);
+    //     console.log(state);
+    //   }
+    // }, 1000 / 20);
 
     // Classes
 
@@ -177,13 +193,26 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
       await this.refreshPlayerLocation();
     });
 
-    this.listener.on('player_join', (uuid, name) => {
+    this.listener.on('player_join', async (uuid, name) => {
       if (uuid === this.uuid || this.connectedPlayers.find(i => i.uuid === uuid || i.name === name)) return;
-      this.connectedPlayers.push({
+
+      const obj = {
         uuid,
         name,
         health: name ? this.playerHealths.get(name as string) ?? undefined : undefined,
-      });
+      };
+      this.connectedPlayers.push(obj);
+
+      let p = await playerManager.fetchUUID(uuid).catch(() => null);
+
+      if (!p) {
+        if (name) p = await playerManager.fetchUsername(name!).catch(() => null);
+
+        if (!p) return this.connectedPlayers.splice(this.connectedPlayers.indexOf(obj), 1);
+      }
+
+      obj.uuid = p.uuid;
+      obj.name = p.username;
     });
 
     this.listener.on('player_spawn', (uuid, entityId, location) => {
@@ -194,13 +223,14 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
       }
     });
 
-    this.listener.on('entity_teleport', (entityId, location) => {
+    this.listener.on('entity_teleport', (entityId, location, onGround) => {
       const p = this.connectedPlayers.find(v => v.entityId === entityId);
       if (p) {
         p.location = location;
+        p.onGround = onGround;
       }
     });
-    this.listener.on('entity_move', (entityId, difference) => {
+    this.listener.on('entity_move', (entityId, difference, onGround) => {
       const p = this.connectedPlayers.find(v => v.entityId === entityId);
       if (p) {
         p.location ??= {
@@ -211,6 +241,24 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
         p.location.x += difference.x;
         p.location.y += difference.y;
         p.location.z += difference.z;
+
+        p.onGround = onGround;
+      }
+    });
+    this.listener.on('entity_look', (entityId, dir, raw, onGround) => {
+      const p = this.connectedPlayers.find(v => v.entityId === entityId);
+      if (p) {
+        p.direction = dir;
+        p.rawDirection = raw;
+
+        if (onGround != undefined) p.onGround = onGround;
+      }
+    });
+
+    this.listener.on('entity_velocity', (entityId, velocity) => {
+      const p = this.connectedPlayers.find(v => v.entityId === entityId);
+      if (p) {
+        p.velocity = velocity;
       }
     });
 
@@ -219,13 +267,15 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
       if (p !== -1) this.connectedPlayers.splice(p, 1);
     });
 
-    this.listener.on('client_move', location => {
+    this.listener.on('client_move', (location, onGround) => {
       this.lastLocation = this.location;
       this.location = location;
+      if (onGround !== undefined) this.onGround = onGround;
     });
-    this.listener.on('client_face', (direction, raw) => {
+    this.listener.on('client_face', (direction, raw, onGround) => {
       this.direction = direction;
       this.rawDirection = raw;
+      if (onGround !== undefined) this.onGround = onGround;
     });
 
     this.listener.on('team_create', name => {
@@ -256,10 +306,14 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
           name,
           health,
         } as any;
+
         this.connectedPlayers.push(p);
-        const uuid = (await playerManager.fetchUsername(name).catch(i => null))?.uuid;
-        if (uuid) p.uuid = uuid;
-        else this.connectedPlayers.splice(this.connectedPlayers.indexOf(p, 1));
+        const f = await playerManager.fetchUsername(name).catch(i => null);
+
+        if (f) {
+          p.uuid = f.uuid;
+          p.name = f.username;
+        } else this.connectedPlayers.splice(this.connectedPlayers.indexOf(p, 1));
       }
     });
 

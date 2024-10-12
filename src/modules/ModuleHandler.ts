@@ -85,7 +85,7 @@ export default class ModuleHandler {
 
         this.modules.set(ref.id, ref);
       } catch (err: any) {
-        Logger.error(`Module "${path.split('/')[path.split('/').length - 1].split('.').slice(0, -1).join('.')}" is invalid:`, err?.message ?? err);
+        Logger.error(`Module "${path.split('/')[path.split('/').length - 1].split('.').slice(0, -1).join('.')}" is invalid:`, err);
       }
     } catch (err: any) {
       Logger.error(`Failed to load module "${path.split('/')[path.split('/').length - 1].split('.').slice(0, -1).join('.')}":`, err?.message ?? err);

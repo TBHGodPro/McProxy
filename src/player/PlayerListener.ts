@@ -15,10 +15,14 @@ export function parseLocation(data: Location) {
   };
 }
 export function parseDirection(data: Direction) {
+  data.pitch *= -1;
+
   while (data.pitch > 90) data.pitch -= 360;
   while (data.pitch < -90) data.pitch += 360;
 
-  while (data.yaw > 360) data.yaw -= 360;
+  data.yaw *= -1;
+
+  while (data.yaw >= 360) data.yaw -= 360;
   while (data.yaw < 0) data.yaw += 360;
 
   return {
@@ -95,7 +99,10 @@ export default class PlayerListener extends (EventEmitter as new () => TypedEmit
         if (name === 'entity_destroy') for (const id of data.entityIds) this.emit('player_leave', id);
 
         if (name === 'entity_teleport') {
-          this.emit('entity_teleport', data.entityId, parseLocation(data));
+          this.emit('entity_teleport', data.entityId, parseLocation(data), data.onGround);
+          if (data.yaw && data.pitch) {
+            this.emit('entity_look', data.entityId, parseDirection(data), { yaw: data.yaw, pitch: data.pitch });
+          }
         }
         if (name === 'rel_entity_move' || name === 'entity_move_look') {
           this.emit(
@@ -105,8 +112,12 @@ export default class PlayerListener extends (EventEmitter as new () => TypedEmit
               x: data.dX,
               y: data.dY,
               z: data.dZ,
-            })
+            }),
+            data.onGround
           );
+        }
+        if (name === 'entity_look' || name === 'entity_move_look') {
+          this.emit('entity_look', data.entityId, parseDirection(data), { yaw: data.yaw, pitch: data.pitch }, data.onGround);
         }
 
         if (name === 'entity_velocity') {
@@ -123,15 +134,16 @@ export default class PlayerListener extends (EventEmitter as new () => TypedEmit
 
         if (name === 'position') {
           this.emit('client_move', {
-            x: data.x,
-            y: data.y,
-            z: data.z,
+            x: data.flags & 0x01 ? player.location.x + data.x : data.x,
+            y: data.flags & 0x02 ? player.location.y + data.y : data.y,
+            z: data.flags & 0x04 ? player.location.z + data.z : data.z,
           });
-          if (data.yaw && data.pitch)
-            this.emit('client_face', parseDirection(data), {
-              yaw: data.yaw,
-              pitch: data.pitch,
-            });
+          if (data.yaw && data.pitch) {
+            const yaw = data.flags & 0x08 ? player.rawDirection.yaw + data.yaw : data.yaw;
+            const pitch = data.flags & 0x10 ? player.rawDirection.pitch + data.pitch : data.pitch;
+
+            this.emit('client_face', parseDirection({ yaw, pitch }), { yaw, pitch });
+          }
         }
 
         if (name === 'update_health') {
@@ -162,13 +174,13 @@ export default class PlayerListener extends (EventEmitter as new () => TypedEmit
           x: data.x,
           y: data.y,
           z: data.z,
-        });
+        }, data.onGround);
       }
       if (name === 'look' || name === 'position_look') {
         this.emit('client_face', parseDirection(data), {
           yaw: data.yaw,
           pitch: data.pitch,
-        });
+        }, data.onGround);
       }
 
       // if (name === 'window_click') {
