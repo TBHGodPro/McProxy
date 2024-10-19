@@ -15,6 +15,9 @@ import { setTimeout as wait } from 'timers/promises';
 import { playerManager } from '..';
 import { Physics } from 'prismarine-physics';
 import Utils from 'src/utils/Utils';
+import world from 'prismarine-world';
+import { Anvil } from 'prismarine-provider-anvil/src/index';
+import { resolve } from 'path';
 
 export default class Player extends (EventEmitter as new () => TypedEventEmitter<PlayerEvents>) {
   public readonly proxy: PlayerProxy;
@@ -31,6 +34,9 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
   public readonly hypixel: ModAPIClient;
   public readonly apollo: ApolloPlayer;
 
+  public readonly world: import('prismarine-world/types/world').World;
+  public readonly anvil: typeof import('prismarine-provider-anvil/src/index').Anvil;
+
   public lastGameMode: string | null = null;
   public isHypixel: boolean = false;
   public online: boolean | null = null;
@@ -44,6 +50,7 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
     return this.client?.username ?? null;
   }
   public state: PlayerState = { health: 20, food: 20, saturation: 20 };
+  public isCrouched: boolean = false;
   public location: Location = { x: 0, y: 0, z: 0 };
   public lastLocation: Location = { x: 0, y: 0, z: 0 };
   public direction: Direction = { yaw: 0, pitch: 0 };
@@ -109,6 +116,8 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
     this.modules = new ModuleHandler(this);
     this.commands = new CommandHandler();
 
+    this.anvil = new (Anvil('1.8.9'))(resolve(__dirname, '../../world'));
+    this.world = new (world('1.8.9'))(null, this.anvil);
     // APIs
 
     this.hypixel = new ModAPIClient({
@@ -276,6 +285,10 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
       this.direction = direction;
       this.rawDirection = raw;
       if (onGround !== undefined) this.onGround = onGround;
+    });
+
+    this.listener.on('client_crouch', crouched => {
+      this.isCrouched = crouched;
     });
 
     this.listener.on('team_create', name => {

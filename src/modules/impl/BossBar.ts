@@ -54,8 +54,8 @@ export default class BossBarModule extends Module<BossBarSettings> {
   private get location(): Location {
     return (
       this.realLocation ??
-      (this.player.location && this.player.direction
-        ? calculateBlock(this.player.location, this.player.direction)
+      (this.player.location && this.player.rawDirection
+        ? calculateBlock(this.player.location, this.player.rawDirection)
         : {
             x: 0,
             y: 0,

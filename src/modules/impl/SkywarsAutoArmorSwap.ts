@@ -225,8 +225,8 @@ export default class SkywarsAutoArmorSwapModule extends Module<SkywarsAutoArmorS
       if (this.isSwitching)
         this.player.client?.write('position', {
           ...(this.player.lastLocation ?? location),
-          yaw: this.player.direction.yaw,
-          pitch: this.player.direction.pitch,
+          yaw: this.player.rawDirection.yaw,
+          pitch: this.player.rawDirection.pitch,
           flags: 0,
         });
     });

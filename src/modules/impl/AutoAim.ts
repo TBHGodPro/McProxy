@@ -82,6 +82,17 @@ export default class AutoAimModule extends Module<AutoAimSettings> {
           );
           dir.pitch *= -1;
 
+          if (!this.player.isCrouched) {
+            const targetYaw = Utils.toDegrees(Math.atan2(this.target.x - this.player.location.x, this.target.z - this.player.location.z));
+            const targetPitch = Utils.toDegrees(Math.atan2(this.target.y - this.player.location.y, Math.hypot(this.target.x - this.player.location.x, this.target.z - this.player.location.z)));
+
+            const yawOffset = targetYaw - Utils.wrapDegrees(this.player.direction.yaw);
+            const pitchOffset = targetPitch - Utils.wrapDegrees(this.player.direction.pitch);
+
+            if (Math.abs(yawOffset) > 0) dir.yaw += yawOffset;
+            // if (Math.abs(pitchOffset) > 3) dir.pitch += pitchOffset;
+          }
+
           // this.player.client?.write('position', {
           //   flags: 0,
           //   ...this.player.location,
@@ -104,6 +115,7 @@ export default class AutoAimModule extends Module<AutoAimSettings> {
       let pos: Location = this.player.location;
       let traveled = 0;
 
+      // TODO: Hypotenuse-based tracking, rather than brute-force
       while (!player && traveled < AutoAimModule.MAX_RANGE) {
         const dist = traveled == 0 ? AutoAimModule.SEARCH_INTERVAL * 10 : AutoAimModule.SEARCH_INTERVAL;
 
@@ -119,6 +131,8 @@ export default class AutoAimModule extends Module<AutoAimSettings> {
 
         player = this.player.connectedPlayers.find(i => i.location && i.uuid && i.name && Utils.isNear(i.location, pos, 5));
       }
+
+      if (!player && this.focus) player = this.player.connectedPlayers.find(i => i.uuid && parseUUID(i.uuid).toString(true) === this.focus!.toString(true));
 
       if (player) {
         const uuid = parseUUID(player.uuid);

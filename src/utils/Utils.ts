@@ -14,8 +14,10 @@ export default class Utils {
   }
 
   public static toRadians(degrees: number): number {
-    let val = degrees * (Math.PI / 180);
+    return this.wrapRadians(degrees * (Math.PI / 180));
+  }
 
+  public static wrapRadians(val: number): number {
     while (val <= -Math.PI) val += 2 * Math.PI;
     while (val > Math.PI) val -= 2 * Math.PI;
 
@@ -23,8 +25,10 @@ export default class Utils {
   }
 
   public static toDegrees(radians: number): number {
-    let val = radians * (180 / Math.PI);
+    return this.wrapDegrees(radians * (180 / Math.PI));
+  }
 
+  public static wrapDegrees(val: number): number {
     while (val <= -180) val += 360;
     while (val > 180) val -= 360;
 

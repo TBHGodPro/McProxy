@@ -41,7 +41,14 @@ export default class PlayerListener extends (EventEmitter as new () => TypedEmit
 
     proxyHandler.on('fromServer', ({ name, data }) => {
       (async () => {
-        // Chat packet
+        if (name === 'map_chunk') {
+          // player.anvil.saveRaw(data.x, data.z, data.chunkData);
+        }
+
+        if (name === 'map_chunk_bulk') {
+          Logger.warn('MAP CHUNK BULK RECEIVED, NO HANDLING');
+        }
+
         if (name === 'chat') {
           try {
             // Server Full
@@ -170,18 +177,29 @@ export default class PlayerListener extends (EventEmitter as new () => TypedEmit
 
     proxyHandler.on('fromClient', ({ name, data }) => {
       if (name === 'position' || name === 'position_look') {
-        this.emit('client_move', {
-          x: data.x,
-          y: data.y,
-          z: data.z,
-        }, data.onGround);
+        this.emit(
+          'client_move',
+          {
+            x: data.x,
+            y: data.y,
+            z: data.z,
+          },
+          data.onGround
+        );
       }
       if (name === 'look' || name === 'position_look') {
-        this.emit('client_face', parseDirection(data), {
-          yaw: data.yaw,
-          pitch: data.pitch,
-        }, data.onGround);
+        this.emit(
+          'client_face',
+          parseDirection(data),
+          {
+            yaw: data.yaw,
+            pitch: data.pitch,
+          },
+          data.onGround
+        );
       }
+
+      if (name === 'entity_action' && [0, 1].includes(data.actionId)) this.emit('client_crouch', data.actionId === 0);
 
       // if (name === 'window_click') {
       //   player.inventory.acceptClick(

@@ -38,6 +38,7 @@ export type ListenerEvents = {
   inventory_slot: (slot: number, item: Slot) => void;
   player_state: (state: PlayerState) => void;
   health: (name: string, health: number) => void;
+  client_crouch: (crouched: boolean) => void;
 };
 
 export interface Location {

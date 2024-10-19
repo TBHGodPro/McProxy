@@ -32,9 +32,12 @@
     "minecraft-data": "^3.70.0",
     "minecraft-protocol": "^1.47.0",
     "node-rsa": "^1.1.1",
+    "prismarine-chunk": "^1.35.0",
     "prismarine-physics": "^1.8.0",
+    "prismarine-provider-anvil": "^2.7.0",
     "prismarine-proxy": "^1.1.4",
     "prismarine-windows": "^2.9.0",
+    "prismarine-world": "^3.6.3",
     "structured-clone": "^0.2.2",
     "uuid": "^9.0.1",
     "vec3": "^0.1.10"
