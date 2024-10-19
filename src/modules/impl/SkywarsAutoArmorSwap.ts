@@ -55,6 +55,8 @@ export default class SkywarsAutoArmorSwapModule extends Module<SkywarsAutoArmorS
   } as const;
   private readonly offsets = ['helmet', 'chestplate', 'leggings', 'boots'] as const;
 
+  private packets: any[] | null = null;
+
   private getPiece(item: Slot): Piece | null {
     const id = item.blockId;
 
@@ -129,6 +131,7 @@ export default class SkywarsAutoArmorSwapModule extends Module<SkywarsAutoArmorS
             const hasItem = !!this.wearing[item.piece];
 
             if (this.settings.pauseTimeMS >= 0) this.isSwitching = true;
+            this.packets = [];
 
             this.wearing[item.piece] = {
               ...item,
@@ -206,6 +209,8 @@ export default class SkywarsAutoArmorSwapModule extends Module<SkywarsAutoArmorS
 
               setTimeout(() => {
                 this.isSwitching = false;
+                this.packets?.forEach(packet => this.player.server?.write(packet.name, packet.data));
+                this.packets = null;
               }, 500);
             }, 0);
             return false;
@@ -217,18 +222,21 @@ export default class SkywarsAutoArmorSwapModule extends Module<SkywarsAutoArmorS
     this.player.proxy.on('fromClient', ({ data, name }, toClient) => {
       if (name === 'window_click' && data.action) this.lastAction = data.action;
       if (name === 'position' || name === 'position_look' || name === 'look') {
-        if (this.isSwitching) return false;
+        if (this.isSwitching) {
+          this.packets?.push({ name, data });
+          return false;
+        }
       }
     });
 
     this.player.listener.on('client_move', location => {
-      if (this.isSwitching)
-        this.player.client?.write('position', {
-          ...(this.player.lastLocation ?? location),
-          yaw: this.player.rawDirection.yaw,
-          pitch: this.player.rawDirection.pitch,
-          flags: 0,
-        });
+      // if (this.isSwitching)
+      //   this.player.client?.write('position', {
+      //     ...(this.player.lastLocation ?? location),
+      //     yaw: this.player.rawDirection.yaw,
+      //     pitch: this.player.rawDirection.pitch,
+      //     flags: 0,
+      //   });
     });
   }
 }
