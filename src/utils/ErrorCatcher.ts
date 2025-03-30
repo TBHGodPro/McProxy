@@ -22,5 +22,6 @@ process.on('uncaughtException', err => {
     process.exit(1);
   }
 
-  throw err;
+  // throw err;
+  console.error(err);
 });

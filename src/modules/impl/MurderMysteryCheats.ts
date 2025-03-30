@@ -1,9 +1,14 @@
 import { UUID, parseUUID } from '@minecraft-js/uuid';
 import { playerManager } from '../../';
 import Module, { ModuleInfo, ModuleSettings, ModuleSettingsSchema } from '../Module';
+import { Position } from 'src/PacketTypings';
+import { parseLocation } from 'src/player/PlayerListener';
 
 export default class MurderMysteryCheatsModule extends Module<MurderMysteryCheatsSettings> {
   private readonly roles: Map<string, Role> = new Map();
+  private readonly possibleDeaths: Map<number, Position> = new Map();
+  private readonly bowWapoints: Map<number, string> = new Map();
+  private readonly possibleBows: Map<number, Position> = new Map();
 
   public getModuleInfo(): ModuleInfo {
     return {
@@ -21,6 +26,7 @@ export default class MurderMysteryCheatsModule extends Module<MurderMysteryCheat
       reveals: true,
       highlights: true,
       deathNotifs: true,
+      bowFind: true,
     };
   }
 
@@ -30,6 +36,7 @@ export default class MurderMysteryCheatsModule extends Module<MurderMysteryCheat
       reveals: 'boolean',
       highlights: 'boolean',
       deathNotifs: 'boolean',
+      bowFind: 'boolean',
     };
   }
 
@@ -46,24 +53,30 @@ export default class MurderMysteryCheatsModule extends Module<MurderMysteryCheat
       }
 
       if (this.settings.reveals && name === 'entity_equipment') {
-        if (data.item.blockId === 261) {
+        if (/*data.item.blockId === 261*/ (data.item?.nbtData?.value as any)?.display?.value?.Name?.value?.toUpperCase()?.includes('BOW') || (data.item?.nbtData?.value as any)?.ExtraAttributes?.value?.detectiveBow?.value == 1) {
           const target = this.player.connectedPlayers.find(i => i.entityId === data.entityId);
           if (!target) return;
 
           const uuid = parseUUID(target.uuid).toString(true);
-          if (this.roles.get(uuid) !== Role.BOW && this.roles.get(uuid) !== Role.MURDERER) {
-            this.roles.set(uuid, Role.BOW);
+          if (this.roles.get(uuid) !== Role.DETECTIVE && this.roles.get(uuid) !== Role.MURDERER) {
+            if ((data.item?.nbtData?.value as any)?.ExtraAttributes?.value?.detectiveBow?.value == 1) {
+              this.roles.set(uuid, Role.DETECTIVE);
 
-            this.player.apollo.showNotification('BOW', target.name ? `${target.name} has a bow!` : 'A Player has a bow!', { durationMS: 2000 });
+              this.player.apollo.showNotification('DETECTIVE', target.name ? `${target.name} is a detective!` : 'A detective has been identified!', { durationMS: 3500 });
+            } else if (this.roles.get(uuid) !== Role.BOW) {
+              this.roles.set(uuid, Role.BOW);
+
+              this.player.apollo.showNotification('BOW', target.name ? `${target.name} has a bow!` : 'A Player has a bow!', { durationMS: 2000 });
+            }
           }
         }
 
-        if (knives.includes(data.item.blockId)) {
+        if (/*knives.includes(data.item.blockId)*/ (data.item?.nbtData?.value as any)?.ExtraAttributes?.value?.KNIFE?.value == 1) {
           const target = this.player.connectedPlayers.find(i => i.entityId === data.entityId);
           if (!target) return;
 
           const uuid = parseUUID(target.uuid).toString(true);
-          if (this.roles.get(uuid) !== Role.BOW && this.roles.get(uuid) !== Role.MURDERER) {
+          if (this.roles.get(uuid) !== Role.DETECTIVE && this.roles.get(uuid) !== Role.MURDERER) {
             this.roles.set(uuid, Role.MURDERER);
 
             this.player.apollo.showNotification('MURDERER', target.name ? `${target.name} is the Murderer!` : 'The Murderer has been Identified!', { durationMS: 2000 });
@@ -71,6 +84,35 @@ export default class MurderMysteryCheatsModule extends Module<MurderMysteryCheat
             this.player.sendMessage(`\n§l§cMURDERER§l§7: ${target.name ? `§6${target.name} §r§fis the Murderer!` : '§r§fThe Murderer has been identified!'}\n`);
           }
         }
+      }
+
+      if (this.settings.bowFind && name === 'spawn_entity' && data.entityId > 1000) {
+        this.possibleDeaths.set(
+          data.entityId,
+          parseLocation({
+            x: data.x,
+            y: data.y,
+            z: data.z,
+          })
+        );
+      }
+
+      if (this.settings.bowFind && name === 'entity_teleport' && this.possibleDeaths.has(data.entityId)) {
+        const d = parseLocation(data);
+        this.possibleDeaths.get(data.entityId)!.x = d.x;
+        this.possibleDeaths.get(data.entityId)!.y = d.y;
+        this.possibleDeaths.get(data.entityId)!.z = d.z;
+      }
+
+      if (this.settings.bowFind && (name === 'rel_entity_move' || name === 'entity_move_look') && this.possibleDeaths.has(data.entityId)) {
+        const d = parseLocation({
+          x: data.dX,
+          y: data.dY,
+          z: data.dZ,
+        });
+        this.possibleDeaths.get(data.entityId)!.x += d.x;
+        this.possibleDeaths.get(data.entityId)!.y += d.y;
+        this.possibleDeaths.get(data.entityId)!.z += d.z;
       }
 
       if (this.settings.deathNotifs && name === 'entity_metadata' && data.metadata.find(i => i.type === 4 && i.key === 2 && i.value.toLowerCase().includes('last words'))) {
@@ -85,11 +127,45 @@ export default class MurderMysteryCheatsModule extends Module<MurderMysteryCheat
 
             if (!player || !this.roles.has(player.uuid) || this.roles.get(player.uuid) === Role.DEAD) return;
 
-            if (this.roles.get(player.uuid) === Role.BOW) this.player.apollo.showNotification('BOW DEATH', `A person with a bow, ${player.username}, has died!`, { durationMS: 2000 });
-            else this.player.apollo.showNotification('DEATH', `${player.username} has died!`, { durationMS: 2000 });
+            if (this.roles.get(player.uuid) === Role.BOW) this.player.apollo.showNotification('BOW DEATH', `A person with a bow, ${player.username}, has died!`, { durationMS: 1500 });
+            else if (this.roles.get(player.uuid) === Role.DETECTIVE) {
+              this.player.apollo.showNotification('DETECTIVE DEATH', `A detective, ${player.username}, has died!`, { durationMS: 3000 });
+
+              console.log(data.entityId, player, this.possibleDeaths.get(data.entityId));
+
+              if (!this.possibleDeaths.has(data.entityId) && this.player.connectedPlayers.find(i => i.name == player.username)?.location) this.possibleDeaths.set(data.entityId, this.player.connectedPlayers.find(i => i.name == player.username)?.location!);
+
+              if (this.possibleDeaths.has(data.entityId)) {
+                this.player.apollo.addWaypoint({
+                  color: this.getRoleColor(Role.DETECTIVE),
+                  hidden: false,
+                  location: {
+                    world: 'world',
+                    x: Math.floor(this.possibleDeaths.get(data.entityId)!.x),
+                    y: Math.floor(this.possibleDeaths.get(data.entityId)!.y),
+                    z: Math.floor(this.possibleDeaths.get(data.entityId)!.z),
+                  },
+                  name: `${player.username}'s Bow`,
+                  preventRemoval: false,
+                });
+                this.bowWapoints.set(data.entityId, `${player.username}'s Bow`);
+                console.log(this.bowWapoints, this.possibleDeaths.get(data.entityId));
+              }
+            } else if (this.roles.get(player.uuid) === Role.MURDERER) this.player.apollo.showNotification('MURDERER DEATH', `A murderer, ${player.username}, has died!`, { durationMS: 1500 });
+            else this.player.apollo.showNotification('DEATH', `${player.username} has died!`, { durationMS: 1500 });
 
             this.roles.set(player.uuid, Role.DEAD);
           })();
+        }
+      }
+
+      if (name === 'entity_destroy') {
+        for (let i of data.entityIds) {
+          for (let f = -4; f < 2; f++)
+            if (this.bowWapoints.has(i + f)) {
+              this.player.apollo.removeWaypoint(this.bowWapoints.get(i + f)!);
+              this.bowWapoints.delete(i + f);
+            }
         }
       }
 
@@ -101,7 +177,12 @@ export default class MurderMysteryCheatsModule extends Module<MurderMysteryCheat
       }
     });
 
-    this.player.listener.on('switch_server', () => this.roles.clear());
+    this.player.listener.on('switch_server', () => {
+      if (this.enabled && this.settings.bowFind && this.roles.size) this.player.apollo.removeAllWaypoints();
+      this.roles.clear();
+      this.possibleDeaths.clear();
+      this.bowWapoints.clear();
+    });
 
     setInterval(() => {
       if (!this.enabled || !this.player.isInGameMode('MURDER_')) return this.roles.clear();
@@ -121,8 +202,11 @@ export default class MurderMysteryCheatsModule extends Module<MurderMysteryCheat
       case Role.INNOCENT:
         return 0xffffff;
 
+      case Role.DETECTIVE:
+        return 0x1111dd;
+
       case Role.BOW:
-        return 0x3333ff;
+        return 0x8888ff;
 
       case Role.MURDERER:
         return 0xff2222;
@@ -138,11 +222,13 @@ interface MurderMysteryCheatsSettings extends ModuleSettings {
   reveals: boolean;
   highlights: boolean;
   deathNotifs: boolean;
+  bowFind: boolean;
 }
 
 enum Role {
   NONE,
   INNOCENT,
+  DETECTIVE,
   BOW,
   MURDERER,
   DEAD,

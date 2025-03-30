@@ -70,7 +70,7 @@ export default class AutoAimModule extends Module<AutoAimSettings> {
           const dir = Physics.getNeededArrowAngle(
             {
               x: this.player.location.x,
-              y: this.player.location.y + 0.6,
+              y: this.player.location.y + 0.5,
               z: this.player.location.z,
             },
             {
@@ -90,7 +90,7 @@ export default class AutoAimModule extends Module<AutoAimSettings> {
             const pitchOffset = targetPitch - Utils.wrapDegrees(this.player.direction.pitch);
 
             if (Math.abs(yawOffset) > 0) dir.yaw += yawOffset;
-            // if (Math.abs(pitchOffset) > 3) dir.pitch += pitchOffset;
+            if (Math.abs(pitchOffset) > 3) dir.pitch += pitchOffset;
           }
 
           // this.player.client?.write('position', {
@@ -141,7 +141,7 @@ export default class AutoAimModule extends Module<AutoAimSettings> {
           this.lastFocus = this.focus;
           this.focus = uuid;
 
-          if (this.settings.highlightTarget) {
+          if (this.settings.highlightTarget && this.enabled) {
             if (this.lastFocus) this.player.apollo.removeGlow(this.lastFocus);
             this.player.apollo.glowPlayer(this.focus, this.color);
           }

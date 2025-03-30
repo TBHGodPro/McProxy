@@ -16,6 +16,7 @@ import { playerManager } from '..';
 import { Physics } from 'prismarine-physics';
 import Utils from 'src/utils/Utils';
 import world from 'prismarine-world';
+// @ts-ignore
 import { Anvil } from 'prismarine-provider-anvil/src/index';
 import { resolve } from 'path';
 
@@ -35,7 +36,7 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
   public readonly apollo: ApolloPlayer;
 
   public readonly world: import('prismarine-world/types/world').World;
-  public readonly anvil: typeof import('prismarine-provider-anvil/src/index').Anvil;
+  public readonly anvil;
 
   public lastGameMode: string | null = null;
   public isHypixel: boolean = false;

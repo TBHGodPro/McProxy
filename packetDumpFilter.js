@@ -3,7 +3,7 @@ const { readFileSync, writeFileSync } = require('fs');
 const file = 'packetDump.json';
 const removeKeys = ['map_chunk'];
 
-removeKeys.push('entity_head_rotation', 'entity_move', 'entity_look', 'entity_move_look', 'rel_entity_move', 'position_look', 'transaction', 'keep_alive', 'flying', 'position');
+removeKeys.push('transaction', 'keep_alive', 'map_chunk', 'map');
 
 const data = JSON.parse(readFileSync(file, 'utf-8'));
 

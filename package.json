@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "node .",
-    "build": "npm run clean && tspc",
+    "build": "npm run clean && tspc -b",
     "dev": "npm run build && npm start",
     "clean": "node scripts/clean.js"
   },

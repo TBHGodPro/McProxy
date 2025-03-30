@@ -9,6 +9,7 @@ import { parseUUID } from '@minecraft-js/uuid';
 
 export function parseLocation(data: Location) {
   return {
+    ...data,
     x: data.x / 32,
     y: data.y / 32,
     z: data.z / 32,
