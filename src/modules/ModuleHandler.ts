@@ -135,6 +135,14 @@ export default class ModuleHandler {
     return this.saveModuleDataSync(this.modules.get(id)!, enabled);
   }
 
+  public async setModuleSettings(id: string, settings: ModuleSettings) {
+    return await this.saveModuleData(this.modules.get(id)!, null, settings);
+  }
+
+  public setModuleSettingsSync(id: string, settings: ModuleSettings) {
+    return this.saveModuleDataSync(this.modules.get(id)!, null, settings);
+  }
+
   public async saveModuleData<T extends ModuleSettings>(ref: ModuleReference<T>, enabled?: boolean | null | undefined, changedSettings?: Partial<T> | {} | null | undefined): Promise<{ success: true; ref: ModuleReference<T> } | { success: false; error: Error }> {
     const hasChangedSettings = changedSettings && typeof changedSettings === 'object';
 

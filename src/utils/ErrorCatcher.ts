@@ -1,5 +1,15 @@
 import { toClient } from '../';
 
+process.on('warning', err => {
+  const msg = err.message;
+
+  if (msg.includes('Possible EventEmitter memory leak detected')) {
+    return;
+  }
+
+  console.warn(err);
+});
+
 process.on('uncaughtException', err => {
   const msg = err.message;
 
@@ -20,6 +30,12 @@ process.on('uncaughtException', err => {
   if (msg.includes('listen EADDRINUSE: address already in use')) {
     Logger.error('The Proxy Port is unavailable, check if another program is using it or if another instance of HybrProxy is running.');
     process.exit(1);
+  }
+
+  // Unclean Disconnect
+  if (msg.includes('ECONNRESET')) {
+    Logger.error('Unclean Disconnect');
+    return;
   }
 
   // throw err;

@@ -190,7 +190,7 @@ export default class BossBarModule extends Module<BossBarSettings> {
     this.player.proxy.off('fromServer', this.onPacket);
   }
 
-  private render(skipSpawnedCheck = false): void {
+  public render(skipSpawnedCheck = false): void {
     if (!skipSpawnedCheck && !this.spawned) return this.spawn(true);
 
     this.updatePosition(true);
@@ -212,7 +212,7 @@ export default class BossBarModule extends Module<BossBarSettings> {
     });
   }
 
-  private spawn(skipSpawnedCheck = false) {
+  public spawn(skipSpawnedCheck = false) {
     if (!skipSpawnedCheck && this.spawned) return this.render();
     this.spawned = true;
 
@@ -235,7 +235,7 @@ export default class BossBarModule extends Module<BossBarSettings> {
     });
   }
 
-  private despawn(skipSpawnedCheck = false) {
+  public despawn(skipSpawnedCheck = false) {
     if (!skipSpawnedCheck && !this.spawned) return;
     this.spawned = false;
 
@@ -246,7 +246,7 @@ export default class BossBarModule extends Module<BossBarSettings> {
     if (this.realBossBar) this.player.client?.write('spawn_entity_living', this.realBossBar);
   }
 
-  private setHealth(health: number) {
+  public setHealth(health: number) {
     this.health = Math.min(Math.max(health, 0), 300);
 
     if (this.spawned) this.render();

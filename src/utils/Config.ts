@@ -2,10 +2,13 @@ import { validate } from 'jsonschema';
 import { Config as ConfigType } from '../Types';
 import { existsSync } from 'fs';
 import { resolve } from 'path';
+import { player } from '..';
 
 export default class Config {
   public readonly filePath: string;
   public cached: ConfigType;
+
+  private lastModuleSave: number = 0;
 
   constructor() {
     const customConfigPath = process.argv.find(arg => arg.startsWith('--config='))?.split('=')[1];
@@ -32,6 +35,15 @@ export default class Config {
 
     if (data && validate(data, configSchema).valid) {
       this.cached = data;
+
+      if (Date.now() - this.lastModuleSave > 500 && player?.modules?.modules?.size) {
+        this.lastModuleSave = Date.now();
+        for (const id of Object.keys(data.modules)) {
+          await player.modules.setModuleState(id, data.modules[id].enabled);
+          await player.modules.setModuleSettings(id, data.modules[id].settings);
+        }
+      }
+
       return data;
     } else throw new Error("Can't validate config file!");
   }
@@ -53,6 +65,15 @@ export default class Config {
 
     if (data && validate(data, configSchema).valid) {
       this.cached = data;
+
+      if (Date.now() - this.lastModuleSave > 500 && player?.modules?.modules?.size) {
+        this.lastModuleSave = Date.now();
+        for (const id of Object.keys(data.modules)) {
+          player.modules.setModuleStateSync(id, data.modules[id].enabled);
+          player.modules.setModuleSettingsSync(id, data.modules[id].settings);
+        }
+      }
+
       return data;
     } else throw new Error("Can't validate config file!");
   }

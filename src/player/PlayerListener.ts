@@ -47,7 +47,7 @@ export default class PlayerListener extends (EventEmitter as new () => TypedEmit
         }
 
         if (name === 'map_chunk_bulk') {
-          Logger.warn('MAP CHUNK BULK RECEIVED, NO HANDLING');
+          // Logger.warn('MAP CHUNK BULK RECEIVED, NO HANDLING');
         }
 
         if (name === 'chat') {

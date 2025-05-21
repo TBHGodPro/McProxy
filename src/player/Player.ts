@@ -19,6 +19,7 @@ import world from 'prismarine-world';
 // @ts-ignore
 import { Anvil } from 'prismarine-provider-anvil/src/index';
 import { resolve } from 'path';
+import BossBarModule from 'src/modules/impl/BossBar';
 
 export default class Player extends (EventEmitter as new () => TypedEventEmitter<PlayerEvents>) {
   public readonly proxy: PlayerProxy;
@@ -37,6 +38,8 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
 
   public readonly world: import('prismarine-world/types/world').World;
   public readonly anvil;
+
+  public readonly bossBar: BossBarModule;
 
   public lastGameMode: string | null = null;
   public isHypixel: boolean = false;
@@ -338,6 +341,9 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
 
     this.commands.setup(this);
     this.modules.start(false);
+
+    // Quick-Access Modules
+    this.bossBar = Array.from(this.modules.modules.values()).find(i => i.id === 'bossBar')?.module as any;
   }
 
   public connect(toClient: ServerClient, toServer: Client) {
