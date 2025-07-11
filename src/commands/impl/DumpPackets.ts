@@ -11,6 +11,10 @@ export default class DumpPackets extends Command {
           type: 'number',
           required: true,
         },
+        {
+          type: 'string',
+          required: false,
+        },
       ],
     });
   }
@@ -27,13 +31,14 @@ export default class DumpPackets extends Command {
 
     const callback =
       (from: 'server' | 'client') =>
-      ({ data, name }: any) => {
-        packets.push({
-          name: name,
-          timestamp: Date.now().toString(),
-          packet: data,
-          from,
-        });
+      ({ data: d, name }: any) => {
+        if (data.args[1]?.value?.toString()?.trim()?.length ? name.toLowerCase().includes(data.args[1].value.toString().toLowerCase().trim()) : true)
+          packets.push({
+            name: name,
+            timestamp: Date.now().toString(),
+            packet: d,
+            from,
+          });
       };
 
     this.player.proxy.on('fromServer', callback('server'));

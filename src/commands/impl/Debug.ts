@@ -28,7 +28,7 @@ export default class DebugCommand extends Command {
         .join(', ')}`,
     ];
 
-    this.player.sendMessage(`\n§fHybr§cProxy §f- §6Debug info:\n\n§r${infos.join('\n')}`);
+    this.player.sendMessage(`\n§6MC§fProxy §f- §6Debug info:\n\n§r${infos.join('\n')}`);
 
     this.player.apollo.showNotification('DEBUG', 'Sent Debug Info to Chat', { durationMS: 2000 });
   }

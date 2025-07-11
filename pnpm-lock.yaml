@@ -35,13 +35,13 @@ importers:
         specifier: ^1.4.1
         version: 1.4.1
       lc-apollo-js:
-        specifier: ^1.0.7
-        version: 1.0.7
+        specifier: ^1.0.10
+        version: 1.0.10
       minecraft-data:
         specifier: ^3.70.0
         version: 3.70.0
       minecraft-protocol:
-        specifier: ^1.47.0
+        specifier: 1.47.0
         version: 1.47.0(patch_hash=gz4x3njzkamxsjqw63pi7emf6a)
       node-rsa:
         specifier: ^1.1.1
@@ -347,8 +347,8 @@ packages:
     resolution: {integrity: sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==}
     engines: {node: '>=0.10.0'}
 
-  lc-apollo-js@1.0.7:
-    resolution: {integrity: sha512-5H1vQSbYEsG4bxyrVf7OJJ8mo/B4/SKFUsR0F2XHcDoOCY56VUaQXaAk2VIXZHsSaxxubkC0s8oyLCQTPIfaeA==}
+  lc-apollo-js@1.0.10:
+    resolution: {integrity: sha512-j3nUiRh5wWw72btFmlUzoSM+8A5fRVPvpqylRqhtbY1BALk0qG6Q48LHZx6BNd6xJmbb5XNIDxjhd8J1mQSnjQ==}
 
   lodash.get@4.4.2:
     resolution: {integrity: sha512-z+Uw/vLuy6gQe8cfaFWD7p0wVv8fJl3mbzXh33RS+0oW2wvUqiRXiQ69gLWSLpgB5/6sU+r6BlQR0MBILadqTQ==}
@@ -943,7 +943,7 @@ snapshots:
 
   kind-of@6.0.3: {}
 
-  lc-apollo-js@1.0.7:
+  lc-apollo-js@1.0.10:
     dependencies:
       '@buf/lunarclient_apollo.bufbuild_es': 1.9.0-20240525042717-1da7022e8b79.2(@bufbuild/protobuf@1.10.0)
       '@bufbuild/protobuf': 1.10.0

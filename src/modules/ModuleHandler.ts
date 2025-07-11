@@ -102,7 +102,7 @@ export default class ModuleHandler {
       this.modules.forEach(module => {
         if (module.enabled) module.module.periodic?.();
       });
-    });
+    }, 10);
   }
 
   public stop(event: boolean = true) {

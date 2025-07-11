@@ -7,7 +7,7 @@ import { Client as ModAPIClient } from 'hypixel-mod-api-js';
 import { Player as ApolloPlayer } from 'lc-apollo-js';
 import PlayerListener from './PlayerListener';
 import { Status } from 'hypixel-api-reborn';
-import { Direction, IPlayer, Location, Party, PlayerState, Team } from '../Types';
+import { ChatPosition, Direction, IPlayer, Location, Party, PlayerState, Team } from '../Types';
 import * as prismarineWindow from 'prismarine-windows';
 import ModuleHandler from '../modules/ModuleHandler';
 import CommandHandler from '../commands/CommandHandler';
@@ -418,8 +418,8 @@ export default class Player extends (EventEmitter as new () => TypedEventEmitter
       });
   }
 
-  public sendMessage(text: string): void {
-    this.client?.write('chat', { message: JSON.stringify({ text }) });
+  public sendMessage(text: string, position: ChatPosition = ChatPosition.CHAT): void {
+    this.client?.write('chat', { message: JSON.stringify({ text }), position });
   }
 
   public executeCommand(command: string): void {

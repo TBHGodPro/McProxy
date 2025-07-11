@@ -81,3 +81,9 @@ export interface PlayerState {
   food: number;
   saturation: number;
 }
+
+export enum ChatPosition {
+  CHAT = 0,
+  SYSTEM_MESSAGE = 1,
+  HOTBAR = 2,
+}

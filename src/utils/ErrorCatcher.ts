@@ -28,7 +28,7 @@ process.on('uncaughtException', err => {
 
   // Port Taken
   if (msg.includes('listen EADDRINUSE: address already in use')) {
-    Logger.error('The Proxy Port is unavailable, check if another program is using it or if another instance of HybrProxy is running.');
+    Logger.error('The Proxy Port is unavailable, check if another program is using it or if another instance of MCProxy is running.');
     process.exit(1);
   }
 
